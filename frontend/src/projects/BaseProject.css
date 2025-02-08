@@ -1,0 +1,129 @@
+.project-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.project-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.project-header h1 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.project-version {
+  font-size: 0.875rem;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.project-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-active {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.status-inactive {
+  background: #fce8e6;
+  color: #c5221f;
+}
+
+.status-development {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.project-description {
+  margin-bottom: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.project-metrics {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.project-metrics h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.refresh-metrics-btn {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.2s;
+}
+
+.refresh-metrics-btn:hover {
+  background: #1557b0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metric-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.metric-item label {
+  display: block;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.metric-item span {
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.project-content {
+  margin-bottom: 2rem;
+}
+
+.project-footer {
+  color: #666;
+  font-size: 0.875rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.project-error {
+  text-align: center;
+  padding: 3rem;
+  color: #c5221f;
+}
