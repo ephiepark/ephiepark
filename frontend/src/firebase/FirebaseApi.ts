@@ -1,6 +1,6 @@
 import { collection, getDocs, getDoc, doc, addDoc, query, orderBy } from 'firebase/firestore';
-import { db } from './config';
-import { BlogPost } from '../types/blog';
+import { db } from './config.js';
+import { BlogPost } from '../types/blog.js';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
