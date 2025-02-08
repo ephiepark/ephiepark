@@ -6,25 +6,35 @@ import NewBlogPost from './components/NewBlogPost';
 import EditBlogPost from './components/EditBlogPost';
 import Projects from './components/Projects';
 import Profile from './components/Profile';
-import { FirebaseProvider } from './firebase/FirebaseContext';
+import { FirebaseProvider, useFirebase } from './firebase/FirebaseContext';
 import LoginButton from './components/LoginButton';
 import RequireAuth from './components/RequireAuth';
 import './App.css';
+
+const Navigation = () => {
+  const { user } = useFirebase();
+  
+  return (
+    <nav className="nav-tabs">
+      <div className="nav-links">
+        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/blog" className="nav-link">Blog</Link>
+        <Link to="/projects" className="nav-link">Projects</Link>
+      </div>
+      <div className="auth-section">
+        {user && <Link to="/profile" className="nav-link">Profile</Link>}
+        <LoginButton />
+      </div>
+    </nav>
+  );
+};
 
 function App() {
   return (
     <FirebaseProvider>
       <Router>
         <div className="App">
-          <nav className="nav-tabs">
-            <div className="nav-links">
-              <Link to="/" className="nav-link">Home</Link>
-              <Link to="/blog" className="nav-link">Blog</Link>
-              <Link to="/projects" className="nav-link">Projects</Link>
-              <Link to="/profile" className="nav-link">Profile</Link>
-            </div>
-            <LoginButton />
-          </nav>
+        <Navigation />
 
           <main className="main-content">
             <Routes>

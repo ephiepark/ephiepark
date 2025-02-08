@@ -33,6 +33,12 @@ button:hover {
   gap: 20px;
 }
 
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .nav-link {
   text-decoration: none;
   color: var(--text-primary);
