@@ -7,6 +7,8 @@ import './Profile.css';
 const Profile: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [username, setUsername] = useState('');
+  const [originalUsername, setOriginalUsername] = useState('');
+  const [isUsernameEdited, setIsUsernameEdited] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -25,6 +27,7 @@ const Profile: React.FC = () => {
         if (data) {
           setUserData(data);
           setUsername(data.username);
+          setOriginalUsername(data.username);
         }
       } catch (err) {
         setError('Failed to load user data');
@@ -45,6 +48,8 @@ const Profile: React.FC = () => {
       await api.updateUsername(currentUser.uid, username);
       setUserData(prev => prev ? { ...prev, username } : null);
       setError(null);
+      setOriginalUsername(username);
+      setIsUsernameEdited(false);
     } catch (err) {
       setError('Failed to update username');
       console.error(err);
@@ -66,17 +71,25 @@ const Profile: React.FC = () => {
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+        <div className="username-container">
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => {
+                const newUsername = e.target.value;
+                setUsername(newUsername);
+                setIsUsernameEdited(newUsername !== originalUsername);
+              }}
+              required
+            />
+          </div>
+          {isUsernameEdited && (
+            <button type="submit">Update Username</button>
+          )}
         </div>
-        <button type="submit">Update Username</button>
       </form>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
