@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from './config';
 import { BlogPost } from '../types/blog';
 
@@ -50,6 +50,24 @@ class FirebaseApi {
       })
     );
     await Promise.all(batch);
+  }
+
+  async createBlogPost(title: string, content: string): Promise<string> {
+    const docRef = await addDoc(collection(db, this.BLOG_POSTS_COLLECTION), {
+      title,
+      content,
+      createdAt: Date.now()
+    });
+    return docRef.id;
+  }
+
+  async updateBlogPost(id: string, title: string, content: string): Promise<void> {
+    const docRef = doc(db, this.BLOG_POSTS_COLLECTION, id);
+    await updateDoc(docRef, {
+      title,
+      content,
+      // Not updating createdAt as it should remain the original creation time
+    });
   }
 }
 

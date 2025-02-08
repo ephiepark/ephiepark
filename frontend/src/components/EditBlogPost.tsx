@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import { useNavigate, useParams } from 'react-router-dom';
+import BlogEditor from './BlogEditor';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BlogPost as BlogPostType } from '../types/blog';
-import './Blog.css';
+import { BlogPost } from '../types/blog';
+import './BlogEditor.css';
 
-const BlogPost: React.FC = () => {
+const EditBlogPost: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const firebase = useFirebase();
-  const [post, setPost] = useState<BlogPostType | null>(null);
+  const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +37,10 @@ const BlogPost: React.FC = () => {
     fetchPost();
   }, [postId, firebase, navigate]);
 
+  const handleCancel = () => {
+    navigate(`/blog/${postId}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -45,22 +49,7 @@ const BlogPost: React.FC = () => {
     return null;
   }
 
-  return (
-    <div className="blog-post">
-      <div className="post-header">
-        <h1>{post.title}</h1>
-        <Link to={`/blog/${post.id}/edit`} className="edit-post-button">
-          Edit Post
-        </Link>
-      </div>
-      <div className="post-date">
-        {new Date(post.createdAt).toLocaleDateString()}
-      </div>
-      <div className="post-content">
-        <ReactMarkdown>{post.content}</ReactMarkdown>
-      </div>
-    </div>
-  );
+  return <BlogEditor post={post} onCancel={handleCancel} />;
 };
 
-export default BlogPost;
+export default EditBlogPost;

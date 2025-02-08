@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogPost from './components/BlogPost';
+import NewBlogPost from './components/NewBlogPost';
+import EditBlogPost from './components/EditBlogPost';
 import Projects from './components/Projects';
 import { FirebaseProvider } from './firebase/FirebaseContext';
 import './App.css';
@@ -26,7 +28,9 @@ function App() {
                 </div>
               } />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/new" element={<NewBlogPost />} />
               <Route path="/blog/:postId" element={<BlogPost />} />
+              <Route path="/blog/:postId/edit" element={<EditBlogPost />} />
               <Route path="/projects" element={<Projects />} />
             </Routes>
           </main>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFirebase } from '../firebase/FirebaseContext';
 import { BlogPost } from '../types/blog';
+import './Blog.css';
 
 const Blog: React.FC = () => {
+  const navigate = useNavigate();
   const firebase = useFirebase();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,15 @@ const Blog: React.FC = () => {
 
   return (
     <div className="blog-container">
-      <h1>Blog</h1>
+      <div className="blog-header">
+        <h1>Blog</h1>
+        <button 
+          onClick={() => navigate('/blog/new')} 
+          className="new-post-button"
+        >
+          New Post
+        </button>
+      </div>
       <div className="blog-posts">
         {posts.map(post => (
           <article key={post.id} className="blog-post-preview">
