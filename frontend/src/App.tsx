@@ -5,6 +5,7 @@ import BlogPost from './components/BlogPost';
 import NewBlogPost from './components/NewBlogPost';
 import EditBlogPost from './components/EditBlogPost';
 import Projects from './components/Projects';
+import Profile from './components/Profile';
 import { FirebaseProvider } from './firebase/FirebaseContext';
 import LoginButton from './components/LoginButton';
 import RequireAuth from './components/RequireAuth';
@@ -20,6 +21,7 @@ function App() {
               <Link to="/" className="nav-link">Home</Link>
               <Link to="/blog" className="nav-link">Blog</Link>
               <Link to="/projects" className="nav-link">Projects</Link>
+              <Link to="/profile" className="nav-link">Profile</Link>
             </div>
             <LoginButton />
           </nav>
@@ -51,6 +53,14 @@ function App() {
                 } 
               />
               <Route path="/projects" element={<Projects />} />
+              <Route 
+                path="/profile" 
+                element={
+                  <RequireAuth>
+                    <Profile />
+                  </RequireAuth>
+                } 
+              />
             </Routes>
           </main>
         </div>

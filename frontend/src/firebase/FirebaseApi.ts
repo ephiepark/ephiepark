@@ -1,11 +1,13 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { db, auth, googleProvider } from './config';
 import { BlogPost } from '../types/blog';
+import { UserData } from '../types/user';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
   private readonly BLOG_POSTS_COLLECTION = 'blog_posts';
+  private readonly USERS_COLLECTION = 'users';
   private currentUser: User | null = null;
   private authStateListeners: ((user: User | null) => void)[] = [];
 
@@ -81,7 +83,46 @@ class FirebaseApi {
   // Auth methods
   async signInWithGoogle(): Promise<User> {
     const result = await signInWithPopup(auth, googleProvider);
+    await this.createUserDataIfNotExists(result.user);
     return result.user;
+  }
+
+  private async createUserDataIfNotExists(user: User): Promise<void> {
+    try {
+      const userDoc = doc(db, this.USERS_COLLECTION, user.uid);
+      const userSnap = await getDoc(userDoc);
+      
+      if (!userSnap.exists()) {
+        const userData: UserData = {
+          uid: user.uid,
+          username: user.displayName || 'Anonymous',
+          isAdmin: false
+        };
+        
+        // Use doc() with setDoc() instead of addDoc() to ensure we use the user's UID as the document ID
+        // This is allowed by our security rules since we're checking request.auth.uid == userId
+        await setDoc(userDoc, userData);
+      }
+    } catch (error) {
+      console.error('Error creating user data:', error);
+      throw new Error('Failed to create user profile');
+    }
+  }
+
+  async getUserData(uid: string): Promise<UserData | null> {
+    const userDoc = doc(db, this.USERS_COLLECTION, uid);
+    const userSnap = await getDoc(userDoc);
+    
+    if (!userSnap.exists()) {
+      return null;
+    }
+
+    return userSnap.data() as UserData;
+  }
+
+  async updateUsername(uid: string, username: string): Promise<void> {
+    const userDoc = doc(db, this.USERS_COLLECTION, uid);
+    await updateDoc(userDoc, { username });
   }
 
   async signOut(): Promise<void> {
