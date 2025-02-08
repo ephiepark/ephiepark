@@ -8,17 +8,17 @@
   justify-content: center;
   gap: 20px;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: var(--background);
 }
 
 .nav-link {
   text-decoration: none;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .nav-link:hover {
-  color: #007bff;
+  color: var(--accent);
 }
 
 .main-content {

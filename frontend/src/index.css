@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --background: #000000;
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --accent: #fff;
+  --border: rgba(255, 255, 255, 0.1);
+}
 
 * {
   margin: 0;
@@ -6,13 +14,40 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1a1a2e;
+  background-color: var(--background);
+  color: var(--text-primary);
   overflow-x: hidden;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin-bottom: 1.5rem;
+}
+
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+button {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 code {
@@ -20,13 +55,14 @@ code {
     monospace;
   background: rgba(255, 255, 255, 0.1);
   padding: 0.2em 0.4em;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.9em;
+  color: var(--accent);
 }
 
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--accent);
 }
 
 /* Improve text rendering */
@@ -39,4 +75,29 @@ code {
 /* Remove blue highlight on mobile tap */
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for the whole page */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Add transitions for interactive elements */
+a, button {
+  transition: all 0.3s ease;
+}
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .blog-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .post-title h2 {
+    font-size: 1.75rem;
+  }
 }
