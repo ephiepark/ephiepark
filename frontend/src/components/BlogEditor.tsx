@@ -1,116 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BlogPost } from '../types/blog';
+import './BlogEditor.css';
 
 interface BlogEditorProps {
-  post?: BlogPost; // If provided, we're editing an existing post
-  onCancel: () => void;
+  initialTitle?: string;
+  initialContent?: string;
+  postId?: string;
+  mode: 'create' | 'edit';
 }
 
-const BlogEditor: React.FC<BlogEditorProps> = ({ post, onCancel }) => {
+const BlogEditor: React.FC<BlogEditorProps> = ({
+  initialTitle = '',
+  initialContent = '',
+  postId,
+  mode
+}) => {
   const navigate = useNavigate();
-  const firebase = useFirebase();
-  const [title, setTitle] = useState(post?.title || '');
-  const [content, setContent] = useState(post?.content || '');
-  const [isPreview, setIsPreview] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { api, user } = useFirebase();
+  const [title, setTitle] = useState(initialTitle);
+  const [content, setContent] = useState(initialContent);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
-    if (!title.trim() || !content.trim()) {
-      setError('Title and content are required');
-      return;
-    }
+  if (!user) {
+    navigate('/blog');
+    return null;
+  }
 
-    setIsSaving(true);
-    setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !content) return;
 
+    setSaving(true);
     try {
-      if (post) {
-        // Editing existing post
-        await firebase.updateBlogPost(post.id, title, content);
-        navigate(`/blog/${post.id}`);
+      if (mode === 'edit' && postId) {
+        await api.updateBlogPost(postId, title, content);
+        navigate(`/blog/${postId}`);
       } else {
-        // Creating new post
-        const newPostId = await firebase.createBlogPost(title, content);
+        const newPostId = await api.createBlogPost(title, content);
         navigate(`/blog/${newPostId}`);
       }
-    } catch (err) {
-      setError('Failed to save post. Please try again.');
-      console.error('Error saving post:', err);
+    } catch (error) {
+      console.error('Error saving blog post:', error);
+      alert('Failed to save blog post. Please try again.');
     } finally {
-      setIsSaving(false);
+      setSaving(false);
     }
   };
 
   return (
-    <div className="blog-editor">
+    <form onSubmit={handleSubmit} className="blog-editor">
       <div className="editor-header">
-        <h1>{post ? 'Edit Post' : 'New Post'}</h1>
-        <div className="editor-actions">
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className="preview-toggle"
-          >
-            {isPreview ? 'Edit' : 'Preview'}
-          </button>
-          <button
-            onClick={onCancel}
-            className="cancel-button"
-            disabled={isSaving}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="save-button"
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
+        <h1>{mode === 'create' ? 'New Blog Post' : 'Edit Blog Post'}</h1>
       </div>
-
-      {error && <div className="error-message">{error}</div>}
-
-      {isPreview ? (
-        <div className="preview-mode">
-          <h1>{title}</h1>
-          <div className="post-content">
-            <ReactMarkdown>{content}</ReactMarkdown>
-          </div>
-        </div>
-      ) : (
-        <div className="edit-mode">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Post title"
-            className="title-input"
-          />
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write your post in markdown..."
-            className="content-input"
-          />
-          <div className="markdown-guide">
-            <h4>Markdown Guide:</h4>
-            <p>
-              # Header 1<br />
-              ## Header 2<br />
-              **bold**, *italic*<br />
-              [Link](url)<br />
-              - List item<br />
-              ```code block```
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
+      <div className="editor-content">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Post Title"
+          className="title-input"
+          required
+        />
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Write your post content here..."
+          className="content-input"
+          required
+        />
+      </div>
+      <div className="editor-footer">
+        <button
+          type="button"
+          onClick={() => navigate('/blog')}
+          className="cancel-button"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={saving || !title || !content}
+          className="save-button"
+        >
+          {saving ? 'Saving...' : 'Save Post'}
+        </button>
+      </div>
+    </form>
   );
 };
 

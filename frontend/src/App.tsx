@@ -6,6 +6,8 @@ import NewBlogPost from './components/NewBlogPost';
 import EditBlogPost from './components/EditBlogPost';
 import Projects from './components/Projects';
 import { FirebaseProvider } from './firebase/FirebaseContext';
+import LoginButton from './components/LoginButton';
+import RequireAuth from './components/RequireAuth';
 import './App.css';
 
 function App() {
@@ -14,9 +16,12 @@ function App() {
       <Router>
         <div className="App">
           <nav className="nav-tabs">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/blog" className="nav-link">Blog</Link>
-            <Link to="/projects" className="nav-link">Projects</Link>
+            <div className="nav-links">
+              <Link to="/" className="nav-link">Home</Link>
+              <Link to="/blog" className="nav-link">Blog</Link>
+              <Link to="/projects" className="nav-link">Projects</Link>
+            </div>
+            <LoginButton />
           </nav>
 
           <main className="main-content">
@@ -28,9 +33,23 @@ function App() {
                 </div>
               } />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/new" element={<NewBlogPost />} />
+              <Route 
+                path="/blog/new" 
+                element={
+                  <RequireAuth>
+                    <NewBlogPost />
+                  </RequireAuth>
+                } 
+              />
               <Route path="/blog/:postId" element={<BlogPost />} />
-              <Route path="/blog/:postId/edit" element={<EditBlogPost />} />
+              <Route 
+                path="/blog/:postId/edit" 
+                element={
+                  <RequireAuth>
+                    <EditBlogPost />
+                  </RequireAuth>
+                } 
+              />
               <Route path="/projects" element={<Projects />} />
             </Routes>
           </main>

@@ -1,63 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useFirebase } from '../firebase/FirebaseContext';
 import { BlogPost as BlogPostType } from '../types/blog';
-import './Blog.css';
 
 const BlogPost: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
-  const firebase = useFirebase();
+  const { api, user } = useFirebase();
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (!postId) {
-        navigate('/blog');
-        return;
-      }
-
+      if (!postId) return;
       try {
-        const fetchedPost = await firebase.getBlogPost(postId);
-        if (!fetchedPost) {
-          navigate('/blog');
-          return;
-        }
+        const fetchedPost = await api.getBlogPost(postId);
         setPost(fetchedPost);
       } catch (error) {
         console.error('Error fetching blog post:', error);
-        navigate('/blog');
       } finally {
         setLoading(false);
       }
     };
 
     fetchPost();
-  }, [postId, firebase, navigate]);
+  }, [postId, api]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (!post) {
-    return null;
+    return <div>Post not found</div>;
   }
 
   return (
     <div className="blog-post">
-      <div className="post-header">
+      <div className="blog-post-header">
         <h1>{post.title}</h1>
-        <Link to={`/blog/${post.id}/edit`} className="edit-post-button">
-          Edit Post
+        <div className="post-metadata">
+          <span className="post-date">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </span>
+          {user && (
+            <Link to={`/blog/${post.id}/edit`} className="edit-post-link">
+              Edit Post
+            </Link>
+          )}
+        </div>
+      </div>
+      <div className="blog-post-content">
+        {post.content.split('\n').map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
+      </div>
+      <div className="blog-post-footer">
+        <Link to="/blog" className="back-to-blog">
+          Back to Blog
         </Link>
-      </div>
-      <div className="post-date">
-        {new Date(post.createdAt).toLocaleDateString()}
-      </div>
-      <div className="post-content">
-        <ReactMarkdown>{post.content}</ReactMarkdown>
       </div>
     </div>
   );

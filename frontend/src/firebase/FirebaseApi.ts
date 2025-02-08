@@ -1,12 +1,20 @@
 import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc } from 'firebase/firestore';
-import { db } from './config';
+import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
+import { db, auth, googleProvider } from './config';
 import { BlogPost } from '../types/blog';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
   private readonly BLOG_POSTS_COLLECTION = 'blog_posts';
+  private currentUser: User | null = null;
+  private authStateListeners: ((user: User | null) => void)[] = [];
 
-  private constructor() {}
+  private constructor() {
+    onAuthStateChanged(auth, (user) => {
+      this.currentUser = user;
+      this.authStateListeners.forEach(listener => listener(user));
+    });
+  }
 
   static getInstance(): FirebaseApi {
     if (!FirebaseApi.instance) {
@@ -68,6 +76,32 @@ class FirebaseApi {
       content,
       // Not updating createdAt as it should remain the original creation time
     });
+  }
+
+  // Auth methods
+  async signInWithGoogle(): Promise<User> {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  }
+
+  async signOut(): Promise<void> {
+    await firebaseSignOut(auth);
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUser;
+  }
+
+  onAuthStateChanged(listener: (user: User | null) => void): () => void {
+    this.authStateListeners.push(listener);
+    // Return cleanup function
+    return () => {
+      this.authStateListeners = this.authStateListeners.filter(l => l !== listener);
+    };
+  }
+
+  isAuthenticated(): boolean {
+    return this.currentUser !== null;
   }
 }
 

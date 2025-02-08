@@ -22,10 +22,10 @@
 }
 
 .new-post-button {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--background);
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
   padding: 12px 24px;
-  border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
@@ -34,8 +34,8 @@
 }
 
 .new-post-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: var(--text-primary);
+  color: var(--background);
 }
 
 .blog-posts {
@@ -104,8 +104,9 @@
 }
 
 .edit-post-button {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--background);
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
   padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
@@ -115,8 +116,8 @@
 }
 
 .edit-post-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: var(--text-primary);
+  color: var(--background);
 }
 
 .post-content {

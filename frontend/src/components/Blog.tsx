@@ -6,14 +6,14 @@ import './Blog.css';
 
 const Blog: React.FC = () => {
   const navigate = useNavigate();
-  const firebase = useFirebase();
+  const { api, user } = useFirebase();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const fetchedPosts = await firebase.getBlogPosts();
+        const fetchedPosts = await api.getBlogPosts();
         setPosts(fetchedPosts);
       } catch (error) {
         console.error('Error fetching blog posts:', error);
@@ -23,7 +23,7 @@ const Blog: React.FC = () => {
     };
 
     fetchPosts();
-  }, [firebase]);
+  }, [api]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -33,12 +33,14 @@ const Blog: React.FC = () => {
     <div className="blog-container">
       <div className="blog-header">
         <h1>Blog</h1>
-        <button 
-          onClick={() => navigate('/blog/new')} 
-          className="new-post-button"
-        >
-          New Post
-        </button>
+        {user && (
+          <button 
+            onClick={() => navigate('/blog/new')} 
+            className="new-post-button"
+          >
+            New Post
+          </button>
+        )}
       </div>
       <div className="blog-posts">
         {posts.map(post => (
