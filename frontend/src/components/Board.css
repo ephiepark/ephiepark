@@ -124,3 +124,126 @@
   background-color: var(--text-primary);
   color: var(--background);
 }
+
+/* Comments Section */
+.board-comments {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.board-comments h3 {
+  font-size: 1.8rem;
+  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.comment-form {
+  margin-bottom: 32px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.comment-form button {
+  background-color: var(--background);
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.comment-form button:hover:not(:disabled) {
+  background-color: var(--text-primary);
+  color: var(--background);
+}
+
+.comment-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.comment {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.comment-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+}
+
+.comment-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-actions button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  transition: all 0.3s ease;
+}
+
+.comment-actions button:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.comment-content {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.no-comments {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 24px;
+  font-style: italic;
+}

@@ -93,7 +93,7 @@ const Board: React.FC = () => {
             <h2 className="board-post-title">{post.title}</h2>
           </Link>
           <div className="board-post-meta">
-            Posted by {post.authorName}
+            Posted by {post.authorName} • {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
             {post.isHidden && <span> (Hidden)</span>}
           </div>
         </div>

@@ -1,14 +1,15 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { db, auth, googleProvider } from './config';
 import { BlogPost } from '../types/blog';
-import { BoardPost } from '../types/board';
+import { BoardPost, Comment } from '../types/board';
 import { UserData } from '../types/user';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
   private readonly BLOG_POSTS_COLLECTION = 'blog_posts';
   private readonly BOARD_POSTS_COLLECTION = 'board_posts';
+  private readonly COMMENTS_COLLECTION = 'comments';
   private readonly USERS_COLLECTION = 'users';
   private currentUser: User | null = null;
   private authStateListeners: ((user: User | null) => void)[] = [];
@@ -164,9 +165,70 @@ class FirebaseApi {
       createdAt: Date.now(),
       authorId: user.uid,
       authorName: user.displayName || 'Anonymous',
-      isHidden: false
+      isHidden: false,
+      commentCount: 0
     });
     return docRef.id;
+  }
+
+  // Comment methods
+  async getComments(postId: string): Promise<Comment[]> {
+    const commentsQuery = query(
+      collection(db, this.BOARD_POSTS_COLLECTION, postId, this.COMMENTS_COLLECTION),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(commentsQuery);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }) as Comment);
+  }
+
+  async createComment(postId: string, content: string): Promise<string> {
+    const user = this.getCurrentUser();
+    if (!user) throw new Error('Must be logged in to comment');
+
+    const batch = writeBatch(db);
+    
+    // Create the comment
+    const commentRef = doc(collection(db, this.BOARD_POSTS_COLLECTION, postId, this.COMMENTS_COLLECTION));
+    batch.set(commentRef, {
+      postId,
+      content,
+      createdAt: Date.now(),
+      authorId: user.uid,
+      authorName: user.displayName || 'Anonymous'
+    });
+
+    // Increment the post's comment count
+    const postRef = doc(db, this.BOARD_POSTS_COLLECTION, postId);
+    batch.update(postRef, {
+      commentCount: (await getDoc(postRef)).data()?.commentCount + 1 || 1
+    });
+
+    await batch.commit();
+    return commentRef.id;
+  }
+
+  async updateComment(postId: string, commentId: string, content: string): Promise<void> {
+    const commentRef = doc(db, this.BOARD_POSTS_COLLECTION, postId, this.COMMENTS_COLLECTION, commentId);
+    await updateDoc(commentRef, { content });
+  }
+
+  async deleteComment(postId: string, commentId: string): Promise<void> {
+    const batch = writeBatch(db);
+
+    // Delete the comment
+    const commentRef = doc(db, this.BOARD_POSTS_COLLECTION, postId, this.COMMENTS_COLLECTION, commentId);
+    batch.delete(commentRef);
+
+    // Decrement the post's comment count
+    const postRef = doc(db, this.BOARD_POSTS_COLLECTION, postId);
+    batch.update(postRef, {
+      commentCount: (await getDoc(postRef)).data()?.commentCount - 1 || 0
+    });
+
+    await batch.commit();
   }
 
   async updateBoardPost(id: string, title: string, content: string): Promise<void> {
