@@ -2,6 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogPost from './components/BlogPost';
+import Board from './components/Board';
+import BoardPost from './components/BoardPost';
+import NewBoardPost from './components/NewBoardPost';
+import EditBoardPost from './components/EditBoardPost';
 import NewBlogPost from './components/NewBlogPost';
 import EditBlogPost from './components/EditBlogPost';
 import Projects from './components/Projects';
@@ -21,6 +25,7 @@ const Navigation = () => {
       <div className="nav-links">
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/blog" className="nav-link">Blog</Link>
+        <Link to="/board" className="nav-link">Board</Link>
         <Link to="/projects" className="nav-link">Projects</Link>
       </div>
       <div className="auth-section">
@@ -62,6 +67,24 @@ function App() {
                   element={
                     <RequireAuth>
                       <EditBlogPost />
+                    </RequireAuth>
+                  } 
+                />
+                <Route path="/board" element={<Board />} />
+                <Route path="/board/:postId" element={<BoardPost />} />
+                <Route 
+                  path="/board/new" 
+                  element={
+                    <RequireAuth>
+                      <NewBoardPost />
+                    </RequireAuth>
+                  } 
+                />
+                <Route 
+                  path="/board/:postId/edit" 
+                  element={
+                    <RequireAuth>
+                      <EditBoardPost />
                     </RequireAuth>
                   } 
                 />

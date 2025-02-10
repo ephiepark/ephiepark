@@ -1,12 +1,14 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { db, auth, googleProvider } from './config';
 import { BlogPost } from '../types/blog';
+import { BoardPost } from '../types/board';
 import { UserData } from '../types/user';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
   private readonly BLOG_POSTS_COLLECTION = 'blog_posts';
+  private readonly BOARD_POSTS_COLLECTION = 'board_posts';
   private readonly USERS_COLLECTION = 'users';
   private currentUser: User | null = null;
   private authStateListeners: ((user: User | null) => void)[] = [];
@@ -123,6 +125,74 @@ class FirebaseApi {
   async updateUsername(uid: string, username: string): Promise<void> {
     const userDoc = doc(db, this.USERS_COLLECTION, uid);
     await updateDoc(userDoc, { username });
+  }
+
+  // Board methods
+  async getBoardPosts(): Promise<BoardPost[]> {
+    const postsQuery = query(
+      collection(db, this.BOARD_POSTS_COLLECTION),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(postsQuery);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as BoardPost));
+  }
+
+  async getBoardPost(id: string): Promise<BoardPost | null> {
+    const docRef = doc(db, this.BOARD_POSTS_COLLECTION, id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      return null;
+    }
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data()
+    } as BoardPost;
+  }
+
+  async createBoardPost(title: string, content: string): Promise<string> {
+    const user = this.getCurrentUser();
+    if (!user) throw new Error('Must be logged in to create a post');
+
+    const docRef = await addDoc(collection(db, this.BOARD_POSTS_COLLECTION), {
+      title,
+      content,
+      createdAt: Date.now(),
+      authorId: user.uid,
+      authorName: user.displayName || 'Anonymous',
+      isHidden: false
+    });
+    return docRef.id;
+  }
+
+  async updateBoardPost(id: string, title: string, content: string): Promise<void> {
+    const docRef = doc(db, this.BOARD_POSTS_COLLECTION, id);
+    await updateDoc(docRef, {
+      title,
+      content
+    });
+  }
+
+  async hideBoardPost(id: string, hidden: boolean): Promise<void> {
+    const userData = await this.getUserData(this.getCurrentUser()?.uid || '');
+    if (!userData?.isAdmin) throw new Error('Only admins can hide posts');
+
+    const docRef = doc(db, this.BOARD_POSTS_COLLECTION, id);
+    await updateDoc(docRef, {
+      isHidden: hidden
+    });
+  }
+
+  async deleteBoardPost(id: string): Promise<void> {
+    const userData = await this.getUserData(this.getCurrentUser()?.uid || '');
+    if (!userData?.isAdmin) throw new Error('Only admins can delete posts');
+
+    const docRef = doc(db, this.BOARD_POSTS_COLLECTION, id);
+    await deleteDoc(docRef);
   }
 
   async signOut(): Promise<void> {
