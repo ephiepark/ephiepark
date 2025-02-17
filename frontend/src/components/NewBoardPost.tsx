@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FirebaseApi from '../firebase/FirebaseApi';
-import './BlogEditor.css'; // Reusing blog editor styles
+import './NewBoardPost.css';
 
 const NewBoardPost: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -30,9 +30,9 @@ const NewBoardPost: React.FC = () => {
   };
 
   return (
-    <div className="editor-container">
+    <div className="new-board-post-container">
       <h1>New Board Post</h1>
-      <form onSubmit={handleSubmit} className="editor-form">
+      <form onSubmit={handleSubmit} className="new-board-post-form">
         <div className="form-group">
           <label htmlFor="title">Title:</label>
           <input
