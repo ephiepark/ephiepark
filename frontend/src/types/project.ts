@@ -9,19 +9,18 @@ export interface ProjectConfig {
   lastUpdated: string;
 }
 
-export interface ProjectMetrics {
-  [key: string]: number | string | boolean;
-}
-
 export interface Project {
   id: string;
   config: ProjectConfig;
-  metrics: ProjectMetrics;
+  initializationStatus: 'pending' | 'completed';
 }
 
-export interface ProjectRegistration {
+export interface StaticProjectConfig {
   config: ProjectConfig;
   initialize: () => Promise<void>;
-  getMetrics: () => Promise<ProjectMetrics>;
   Component: React.ComponentType;
+}
+
+export interface ProjectsConfig {
+  [id: string]: StaticProjectConfig;
 }

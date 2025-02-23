@@ -4,29 +4,22 @@ import { projectRegistry } from './registry';
 
 interface ProjectsContextType {
   projects: Project[];
-  refreshProject: (id: string) => Promise<void>;
   getProjectComponent: (id: string) => React.ComponentType | undefined;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(undefined);
 
 export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState(() => projectRegistry.getAllProjects());
 
   useEffect(() => {
-    // Initial load of all projects
-    updateProjectsList();
+    const initializeProjects = async () => {
+      await projectRegistry.initializeAllProjects();
+      setProjects(projectRegistry.getAllProjects());
+    };
+
+    initializeProjects();
   }, []);
-
-  const updateProjectsList = () => {
-    const allProjects = projectRegistry.getAllProjects();
-    setProjects(allProjects);
-  };
-
-  const refreshProject = async (id: string) => {
-    await projectRegistry.refreshProjectMetrics(id);
-    updateProjectsList();
-  };
 
   const getProjectComponent = (id: string) => {
     return projectRegistry.getProjectComponent(id);
@@ -34,7 +27,6 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const value = {
     projects,
-    refreshProject,
     getProjectComponent,
   };
 

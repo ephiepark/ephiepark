@@ -29,26 +29,37 @@
   border-radius: 4px;
 }
 
-.project-status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
+.project-status, .project-initialization {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
   font-weight: 500;
+  margin-left: 8px;
 }
 
 .status-active {
-  background: #e6f4ea;
-  color: #137333;
+  background-color: #4caf50;
+  color: white;
 }
 
 .status-inactive {
-  background: #fce8e6;
-  color: #c5221f;
+  background-color: #f44336;
+  color: white;
 }
 
 .status-development {
-  background: #e8f0fe;
-  color: #1a73e8;
+  background-color: #ff9800;
+  color: white;
+}
+
+.status-pending {
+  background-color: #2196f3;
+  color: white;
+}
+
+.status-completed {
+  background-color: #4caf50;
+  color: white;
 }
 
 .project-description {

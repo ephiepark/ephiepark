@@ -9,7 +9,7 @@ interface BaseProjectProps {
 }
 
 export const BaseProject: React.FC<BaseProjectProps> = ({ id, children }) => {
-  const { projects, refreshProject } = useProjects();
+  const { projects } = useProjects();
   const project = projects.find(p => p.id === id);
 
   if (!project) {
@@ -30,29 +30,14 @@ export const BaseProject: React.FC<BaseProjectProps> = ({ id, children }) => {
           <span className={`project-status status-${project.config.status}`}>
             {project.config.status}
           </span>
+          <span className={`project-initialization status-${project.initializationStatus}`}>
+            {project.initializationStatus}
+          </span>
         </div>
       </header>
 
       <div className="project-description">
         <p>{project.config.description}</p>
-      </div>
-
-      <div className="project-metrics">
-        <h3>Metrics</h3>
-        <button 
-          onClick={() => refreshProject(id)}
-          className="refresh-metrics-btn"
-        >
-          Refresh Metrics
-        </button>
-        <div className="metrics-grid">
-          {Object.entries(project.metrics).map(([key, value]) => (
-            <div key={key} className="metric-item">
-              <label>{key}:</label>
-              <span>{value.toString()}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="project-content">

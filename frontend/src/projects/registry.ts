@@ -1,33 +1,32 @@
-import { Project, ProjectRegistration } from '../types/project';
+import { Project } from '../types/project';
+import { projectsConfig } from './config';
 
 class ProjectRegistry {
-  private projects: Map<string, Project> = new Map();
-  private registrations: Map<string, ProjectRegistration> = new Map();
-
-  async registerProject(id: string, registration: ProjectRegistration): Promise<void> {
-    if (this.registrations.has(id)) {
-      throw new Error(`Project with id ${id} is already registered`);
-    }
-
-    this.registrations.set(id, registration);
-    
-    // Initialize the project
-    await registration.initialize();
-    
-    // Create the project instance
-    const metrics = await registration.getMetrics();
-    const project: Project = {
+  private projects: Map<string, Project> = new Map(
+    Object.entries(projectsConfig).map(([id, config]) => [
       id,
-      config: registration.config,
-      metrics,
-    };
+      {
+        id,
+        config: config.config,
+        initializationStatus: 'pending'
+      }
+    ])
+  );
 
-    this.projects.set(id, project);
-  }
+  async initializeAllProjects(): Promise<void> {
+    const initPromises = Object.entries(projectsConfig).map(async ([id, config]) => {
+      try {
+        await config.initialize();
+        const project = this.projects.get(id)!;
+        project.initializationStatus = 'completed';
+        this.projects.set(id, project);
+      } catch (error) {
+        console.error(`Failed to initialize project ${id}:`, error);
+        // Keep project in pending state to show it failed
+      }
+    });
 
-  unregisterProject(id: string): void {
-    this.projects.delete(id);
-    this.registrations.delete(id);
+    await Promise.all(initPromises);
   }
 
   getProject(id: string): Project | undefined {
@@ -35,25 +34,11 @@ class ProjectRegistry {
   }
 
   getProjectComponent(id: string): React.ComponentType | undefined {
-    const registration = this.registrations.get(id);
-    return registration?.Component;
+    return projectsConfig[id]?.Component;
   }
 
   getAllProjects(): Project[] {
     return Array.from(this.projects.values());
-  }
-
-  async refreshProjectMetrics(id: string): Promise<void> {
-    const registration = this.registrations.get(id);
-    const project = this.projects.get(id);
-    
-    if (!registration || !project) {
-      throw new Error(`Project with id ${id} not found`);
-    }
-
-    const metrics = await registration.getMetrics();
-    project.metrics = metrics;
-    this.projects.set(id, project);
   }
 }
 
