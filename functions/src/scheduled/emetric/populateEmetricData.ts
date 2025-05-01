@@ -1,7 +1,8 @@
 import { onSchedule, ScheduledEvent } from "firebase-functions/v2/scheduler";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { asyncPopulateGDPData } from "./populateGDPData.js";
+import { metricRegistry } from "../../../../shared/emetric/metricRegistry.js";
+import { metricBuilderRegistry } from "./metricBuilderRegistry.js";
 
 /**
  * Scheduled function that runs daily to update emetric data
@@ -16,7 +17,14 @@ export const populateDailyEmetricData = onSchedule({
     logger.info("Starting emetric data population job", { time: new Date().toISOString() });
 
     const db = getFirestore();
-    await asyncPopulateGDPData(db);
+    const dailyMetricList = metricRegistry.filter(metric => metric.updateCycle === 'daily');
+    const awaitables = dailyMetricList.map(async (metric) => {
+      if (metric.id in metricBuilderRegistry) {
+        const asyncMetricBuilder = metricBuilderRegistry[metric.id];
+        await asyncMetricBuilder(db, metric);
+      }
+    });
+    await Promise.all(awaitables);
     
     logger.info("Emetric daily data population job completed successfully");
     return;

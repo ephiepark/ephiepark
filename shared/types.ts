@@ -47,7 +47,6 @@ export interface UserData {
 }
 
 // Emetric Types
-export const EMETRIC_METRICS_COLLECTION = "emetric_metrics";
 export const EMETRIC_TIMESERIES_COLLECTION = "emetric_timeseries";
 
 export type Emetric_Metadata = {

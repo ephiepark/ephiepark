@@ -1,0 +1,22 @@
+import { Emetric_Metric } from "../types.js";
+
+export const getMetricById = (id: string): Emetric_Metric | null => {
+  const ret = metricRegistry.find(metric => metric.id === id);
+  if (ret === null || ret === undefined) {
+    return null;
+  }
+  return ret;
+};
+
+export const metricRegistry: Array<Emetric_Metric> = [
+  {
+    id: "fred_us_gdp_data_id",
+    name: "Gross Domestic Product",
+    description: "The total value of goods produced and services provided in the United States",
+    updateCycle: "daily",
+    unit: "dollar",
+    metadata: {
+      source: "FRED"
+    }
+  },
+];

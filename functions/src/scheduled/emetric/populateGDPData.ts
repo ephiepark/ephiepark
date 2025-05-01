@@ -2,9 +2,8 @@ import { Firestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { FredService, FredMetric } from "../../services/fredService.js";
 import { 
-  EMETRIC_METRICS_COLLECTION,
   EMETRIC_TIMESERIES_COLLECTION,
-  Emetric_Metric, 
+  Emetric_Metric,
   Emetric_TimeSeries, 
   Emetric_TimeSeriesEntry 
 } from "../../../../shared/types.js";
@@ -23,35 +22,12 @@ const GDP_METRIC: FredMetric = {
  * Fetches GDP data from FRED and stores it in Firestore
  * @param db - Firestore database instance
  */
-export const asyncPopulateGDPData = async (db: Firestore): Promise<void> => {
+export const asyncPopulateGDPData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {
   try {
     logger.info("Starting GDP data population");
 
-    const metricId = 'fred_us_gdp_data_id';
-
     // Create FRED service instance
     const fredService = new FredService(FRED_API_KEY);
-
-    // Check if GDP metric exists in Firestore, create if not
-    const metricRef = db.collection(EMETRIC_METRICS_COLLECTION).doc(metricId);
-    const metricDoc = await metricRef.get();
- 
-    if (!metricDoc.exists) {
-      // Create the metric document
-      const gdpMetric: Emetric_Metric = {
-        id: metricId,
-        name: "Gross Domestic Product",
-        description: "The total value of goods produced and services provided in the United States",
-        updateCycle: "quarterly",
-        unit: "dollar",
-        metadata: {
-          source: "FRED"
-        }
-      };
-
-      await metricRef.set(gdpMetric);
-      logger.info("Created GDP metric document");
-    } 
 
     // Fetch GDP data from FRED
     logger.info("Fetching GDP data from FRED");
@@ -69,11 +45,11 @@ export const asyncPopulateGDPData = async (db: Firestore): Promise<void> => {
     }));
 
     // Store time series data in Firestore
-    const timeSeriesRef = db.collection(EMETRIC_TIMESERIES_COLLECTION).doc(metricId);
+    const timeSeriesRef = db.collection(EMETRIC_TIMESERIES_COLLECTION).doc(metric.id);
     
     // Create or update the time series document
     await timeSeriesRef.set({
-      id: metricId,
+      id: metric.id,
       entries: timeSeriesEntries
     } as Emetric_TimeSeries);
 
