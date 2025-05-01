@@ -5,7 +5,6 @@ import { db, auth, googleProvider, functions } from './config';
 import { BlogPost } from '../types/blog';
 import { BoardPost, Comment } from '../types/board';
 import { UserData } from '../types/user';
-import { Metric, DataSource, UserPreferences, MetricData } from '../types/emetric';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
@@ -13,10 +12,6 @@ class FirebaseApi {
   private readonly BOARD_POSTS_COLLECTION = 'board_posts';
   private readonly COMMENTS_COLLECTION = 'comments';
   private readonly USERS_COLLECTION = 'users';
-  private readonly EMETRIC_METRICS_COLLECTION = 'metrics';
-  private readonly EMETRIC_DATA_SOURCES_COLLECTION = 'data_sources';
-  private readonly EMETRIC_USER_PREFERENCES_COLLECTION = 'user_preferences';
-  private readonly EMETRIC_METRIC_DATA_COLLECTION = 'metric_data';
   private currentUser: User | null = null;
   private authStateListeners: ((user: User | null) => void)[] = [];
 
@@ -287,63 +282,6 @@ class FirebaseApi {
     const functionRef = httpsCallable<any, T>(functions, name);
     const result = await functionRef(data);
     return result.data;
-  }
-
-  // Emetric specific methods
-  async emetric_getMetrics(): Promise<Metric[]> {
-    const metricsQuery = collection(db, this.EMETRIC_METRICS_COLLECTION);
-    const querySnapshot = await getDocs(metricsQuery);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Metric));
-  }
-
-  async emetric_createMetric(metric: Omit<Metric, "id">): Promise<Metric> {
-    const docRef = await addDoc(collection(db, this.EMETRIC_METRICS_COLLECTION), metric);
-    return {
-      id: docRef.id,
-      ...metric
-    };
-  }
-
-  async emetric_getDataSources(): Promise<DataSource[]> {
-    const sourcesQuery = collection(db, this.EMETRIC_DATA_SOURCES_COLLECTION);
-    const querySnapshot = await getDocs(sourcesQuery);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as DataSource));
-  }
-
-  async emetric_createDataSource(source: Omit<DataSource, "id">): Promise<DataSource> {
-    const docRef = await addDoc(collection(db, this.EMETRIC_DATA_SOURCES_COLLECTION), source);
-    return {
-      id: docRef.id,
-      ...source
-    };
-  }
-
-  async emetric_getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    const docRef = doc(db, this.EMETRIC_USER_PREFERENCES_COLLECTION, userId);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists()) {
-      return null;
-    }
-
-    return {
-      userId,
-      ...docSnap.data()
-    } as UserPreferences;
-  }
-
-  async emetric_getMetricData(): Promise<MetricData[]> {
-    const metricDataQuery = collection(db, this.EMETRIC_METRIC_DATA_COLLECTION);
-    const querySnapshot = await getDocs(metricDataQuery);
-    return querySnapshot.docs.map(doc => ({
-      ...doc.data()
-    } as MetricData));
   }
 }
 
