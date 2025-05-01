@@ -42,58 +42,94 @@ function App() {
         <div className="App">
           <Navigation />
 
-          <main className="main-content">
+          <main>
             <Routes>
               <Route path="/" element={
-                <div className="home-container">
-                  <h1>Welcome to My Website</h1>
-                  <p>Hi, I'm Ephraim Park. Welcome to my personal website!</p>
+                <div className="main-content">
+                  <div className="home-container">
+                    <h1>Welcome to My Website</h1>
+                    <p>Hi, I'm Ephraim Park. Welcome to my personal website!</p>
+                  </div>
                 </div>
               } />
-              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog" element={
+                <div className="main-content">
+                  <Blog />
+                </div>
+              } />
               <Route
                 path="/blog/new"
                 element={
-                  <RequireAuth>
-                    <NewBlogPost />
-                  </RequireAuth>
+                  <div className="main-content">
+                    <RequireAuth>
+                      <NewBlogPost />
+                    </RequireAuth>
+                  </div>
                 }
               />
-              <Route path="/blog/:postId" element={<BlogPost />} />
+              <Route path="/blog/:postId" element={
+                <div className="main-content">
+                  <BlogPost />
+                </div>
+              } />
               <Route
                 path="/blog/:postId/edit"
                 element={
-                  <RequireAuth>
-                    <EditBlogPost />
-                  </RequireAuth>
+                  <div className="main-content">
+                    <RequireAuth>
+                      <EditBlogPost />
+                    </RequireAuth>
+                  </div>
                 }
               />
-              <Route path="/board" element={<Board />} />
-              <Route path="/board/:postId" element={<BoardPost />} />
+              <Route path="/board" element={
+                <div className="main-content">
+                  <Board />
+                </div>
+              } />
+              <Route path="/board/:postId" element={
+                <div className="main-content">
+                  <BoardPost />
+                </div>
+              } />
               <Route
                 path="/board/new"
                 element={
-                  <RequireAuth>
-                    <NewBoardPost />
-                  </RequireAuth>
+                  <div className="main-content">
+                    <RequireAuth>
+                      <NewBoardPost />
+                    </RequireAuth>
+                  </div>
                 }
               />
               <Route
                 path="/board/:postId/edit"
                 element={
-                  <RequireAuth>
-                    <EditBoardPost />
-                  </RequireAuth>
+                  <div className="main-content">
+                    <RequireAuth>
+                      <EditBoardPost />
+                    </RequireAuth>
+                  </div>
                 }
               />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/:projectId" element={<ProjectPage />} />
+              <Route path="/projects" element={
+                <div className="main-content">
+                  <Projects />
+                </div>
+              } />
+              <Route path="/projects/:projectId" element={
+                <div className="main-content-wide">
+                  <ProjectPage />
+                </div>
+              } />
               <Route
                 path="/profile"
                 element={
-                  <RequireAuth>
-                    <Profile />
-                  </RequireAuth>
+                  <div className="main-content">
+                    <RequireAuth>
+                      <Profile />
+                    </RequireAuth>
+                  </div>
                 }
               />
             </Routes>

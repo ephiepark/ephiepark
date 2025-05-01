@@ -74,10 +74,11 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
 
   return (
     <div className="time-series-chart">
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" aspect={2} height={400}>
         <LineChart
+          width={500}
           data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 

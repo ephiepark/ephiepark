@@ -55,6 +55,11 @@ button:hover {
   margin: 0 auto;
 }
 
+.main-content-wide {
+  padding: 20px;
+  margin: 0 auto;
+}
+
 /* Blog styles */
 .blog-container {
   text-align: left;
