@@ -42,6 +42,39 @@
   width: 100%;
 }
 
+.graph-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.graph-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.remove-graph-button {
+  background-color: #d93025;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.remove-graph-button:hover {
+  background-color: #b7261d;
+}
+
+.remove-graph-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 .graph-container {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
