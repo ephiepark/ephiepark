@@ -2,9 +2,7 @@ import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, se
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, auth, googleProvider, functions } from './config';
-import { BlogPost } from '../types/blog';
-import { BoardPost, Comment } from '../types/board';
-import { UserData } from '../types/user';
+import { BlogPost, BoardPost, Comment, UserData } from '../../../shared/types';
 
 class FirebaseApi {
   private static instance: FirebaseApi;

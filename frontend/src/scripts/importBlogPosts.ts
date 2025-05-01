@@ -1,7 +1,7 @@
 import axios from 'axios';
 import matter from 'gray-matter';
 import FirebaseApi from '../firebase/FirebaseApi.js';
-import { BlogPost } from '../types/blog.js';
+import { BlogPost } from '../../../shared/types.js';
 
 const GITHUB_REPO = 'ephiepark/ephiepark.github.io';
 const POSTS_PATH = '_posts';

@@ -2,8 +2,7 @@ import React, { useEffect, useState, FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import FirebaseApi from '../firebase/FirebaseApi';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BoardPost as BoardPostType, Comment } from '../types/board';
-import { UserData } from '../types/user';
+import { UserData, BoardPost as BoardPostType, Comment } from '../../../shared/types';
 import './Board.css';
 
 const BoardPost: React.FC = () => {

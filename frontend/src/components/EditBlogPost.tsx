@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useFirebase } from '../firebase/FirebaseContext';
 import BlogEditor from './BlogEditor';
-import { BlogPost } from '../types/blog';
+import { BlogPost } from '../../../shared/types';
 
 const EditBlogPost: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
