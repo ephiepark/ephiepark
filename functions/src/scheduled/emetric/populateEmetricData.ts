@@ -1,0 +1,27 @@
+import { onSchedule, ScheduledEvent } from "firebase-functions/v2/scheduler";
+import { getFirestore } from "firebase-admin/firestore";
+import { logger } from "firebase-functions";
+import { asyncPopulateGDPData } from "./populateGDPData.js";
+
+/**
+ * Scheduled function that runs daily to update emetric data
+ */
+export const populateDailyEmetricData = onSchedule({
+  schedule: "0 0 * * *", // Run at midnight every day (cron syntax)
+  timeZone: "America/New_York", // Eastern Time
+  retryCount: 3, // Retry up to 3 times if the function fails
+  memory: "256MiB",
+}, async (event: ScheduledEvent) => {
+  try {
+    logger.info("Starting emetric data population job", { time: new Date().toISOString() });
+
+    const db = getFirestore();
+    await asyncPopulateGDPData(db);
+    
+    logger.info("Emetric daily data population job completed successfully");
+    return;
+  } catch (error) {
+    logger.error("Error in emetric daily data population job:", error);
+    throw error; // Rethrowing will trigger the retry mechanism
+  }
+});

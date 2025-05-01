@@ -1,4 +1,5 @@
-"use strict";
 // Shared type definitions for both frontend and functions
-Object.defineProperty(exports, "__esModule", { value: true });
+// Emetric Types
+export const EMETRIC_METRICS_COLLECTION = "emetric_metrics";
+export const EMETRIC_TIMESERIES_COLLECTION = "emetric_timeseries";
 //# sourceMappingURL=types.js.map

@@ -1,0 +1,7 @@
+{
+  "name": "shared",
+  "engines": {
+    "node": "18"
+  },
+  "type": "module"
+}
