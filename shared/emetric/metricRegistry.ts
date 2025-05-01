@@ -8,6 +8,7 @@ export const getMetricById = (id: string): Emetric_Metric | null => {
   return ret;
 };
 
+// Make sure to update metricBuilderRegistry as well
 export const metricRegistry: Array<Emetric_Metric> = [
   {
     id: "fred_us_gdp_data_id",
