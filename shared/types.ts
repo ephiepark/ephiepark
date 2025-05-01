@@ -45,3 +45,26 @@ export interface UserData {
   username: string;
   isAdmin: boolean;
 }
+
+export type Emetric_Metadata = {
+  source?: string; // FRED, etc. 
+};
+
+// Emtric Types
+export type Emetric_Metric = {
+  id: string;
+  name: string;
+  description: string;
+  updateCycle: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  metadata: Emetric_Metadata; // Optional additional data (e.g. revision, confidence interval)
+};
+
+export type Emetric_TimeSeriesEntry = {
+  timestamp: number;
+  value: number;
+};
+
+export type Emetric_TimeSeries = {
+  id: string;
+  entries: Array<Emetric_TimeSeriesEntry>;
+};
