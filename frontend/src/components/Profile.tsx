@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FirebaseApi from '../firebase/FirebaseApi';
-import { UserData } from 'shared/types';
+import { UserData } from '../shared/types';
 import './Profile.css';
 
 const Profile: React.FC = () => {

@@ -9,7 +9,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-import {Emetric_TimeSeries, Emetric_Metric} from 'shared/types';
+import {Emetric_TimeSeries, Emetric_Metric} from '../../../shared/types';
 
 // Define colors for different metrics
 const CHART_COLORS = [
@@ -39,7 +39,15 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
 
   // If no data is available for the selected metrics, show a message
   const hasData = selectedMetrics.some(id => 
-    timeSeriesData[id] && timeSeriesData[id]?.entries.length > 0
+    { 
+      if (id in timeSeriesData) {
+        const t = timeSeriesData[id];
+        if (t !== null && t.entries.length > 0) {
+          return true;
+        }
+      }
+      return false;
+    }
   );
 
   if (!hasData) {

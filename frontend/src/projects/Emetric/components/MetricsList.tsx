@@ -1,5 +1,5 @@
 import React from 'react';
-import {Emetric_Metric} from 'shared/types';
+import {Emetric_Metric} from '../../../shared/types';
 
 // Define types locally to avoid import issues
 interface MetricsListProps {

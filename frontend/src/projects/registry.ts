@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectConfig } from 'shared/types';
+import { ProjectConfig } from '../shared/types';
 import EmetricProject from './Emetric/EmetricProject';
 
 export const getProjectById = (id: string): ProjectConfig | null => {

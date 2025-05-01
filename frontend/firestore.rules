@@ -22,6 +22,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /emetric_timeseries/{timeSeriesId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     match /emetric_user_preferences/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId;

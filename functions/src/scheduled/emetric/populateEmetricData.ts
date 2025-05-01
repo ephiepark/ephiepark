@@ -1,7 +1,7 @@
 import { onSchedule, ScheduledEvent } from "firebase-functions/v2/scheduler";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { metricRegistry } from "../../../../shared/emetric/metricRegistry.js";
+import { metricRegistry } from "../../shared/emetric/metricRegistry.js";
 import { metricBuilderRegistry } from "./metricBuilderRegistry.js";
 
 /**

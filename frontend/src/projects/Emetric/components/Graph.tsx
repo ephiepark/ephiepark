@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import MetricsList from './MetricsList';
 import TimeSeriesChart from './TimeSeriesChart';
 import FirebaseApi from '../../../firebase/FirebaseApi';
-import {Emetric_Metric, Emetric_TimeSeries} from 'shared/types';
+import {Emetric_Metric, Emetric_TimeSeries} from '../../../shared/types';
+import { metricRegistry } from '../../../shared/emetric/metricRegistry';
 
 // Define types locally to avoid import issues
 interface GraphProps {
@@ -10,30 +11,11 @@ interface GraphProps {
 }
 
 const Graph: React.FC<GraphProps> = ({ id }) => {
-  const [metrics, setMetrics] = useState<Emetric_Metric[]>([]);
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<Record<string, Emetric_TimeSeries | null>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Fetch metrics on component mount
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        setLoading(true);
-        const api = FirebaseApi.getInstance();
-        const metricsData = await api.getEmetricMetrics();
-        setMetrics(metricsData);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching metrics:', err);
-        setError('Failed to load metrics. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    fetchMetrics();
-  }, []);
+  const metrics = metricRegistry;
 
   // Fetch time series data when selected metrics change
   useEffect(() => {
@@ -73,7 +55,7 @@ const Graph: React.FC<GraphProps> = ({ id }) => {
     };
 
     fetchTimeSeriesData();
-  }, [selectedMetrics, timeSeriesData]);
+  }, [selectedMetrics]);
 
   // Handle metric selection/deselection
   const handleMetricToggle = (metricId: string) => {

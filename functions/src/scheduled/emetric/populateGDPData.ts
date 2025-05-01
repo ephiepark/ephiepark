@@ -6,7 +6,7 @@ import {
   Emetric_Metric,
   Emetric_TimeSeries, 
   Emetric_TimeSeriesEntry 
-} from "../../../../shared/types.js";
+} from "../../shared/types.js";
 
 // Configuration
 const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";

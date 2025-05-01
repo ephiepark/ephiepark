@@ -4,7 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "lib",
-    "rootDir": "../",
+    "rootDir": ".",
     "allowJs": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,13 +14,9 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "*": ["*"]
-    },
     "resolveJsonModule": true
   },
   "include": [
     "src",
-    "../shared"
   ]
 }

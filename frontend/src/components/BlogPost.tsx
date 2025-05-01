@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BlogPost as BlogPostType } from 'shared/types';
+import { BlogPost as BlogPostType } from '../shared/types';
 
 const BlogPost: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
