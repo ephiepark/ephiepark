@@ -1,26 +1,11 @@
 import React from 'react';
 
 export interface ProjectConfig {
+  id: string;
   name: string;
   description: string;
-  path: string;
   status: 'active' | 'inactive' | 'development';
-  version: string;
-  lastUpdated: string;
+  permission: 'all' | 'logged-in-user-only' | 'admin-only';
+  component: JSX.Element,
 }
 
-export interface Project {
-  id: string;
-  config: ProjectConfig;
-  initializationStatus: 'pending' | 'completed';
-}
-
-export interface StaticProjectConfig {
-  config: ProjectConfig;
-  initialize: () => Promise<void>;
-  Component: React.ComponentType;
-}
-
-export interface ProjectsConfig {
-  [id: string]: StaticProjectConfig;
-}

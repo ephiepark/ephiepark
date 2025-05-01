@@ -1,22 +1,21 @@
 import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { useProjects } from '../projects/ProjectsContext';
+import { getProjectById } from '../projects/registry';
 
 const ProjectPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const { getProjectComponent } = useProjects();
 
   if (!projectId) {
     return <Navigate to="/projects" replace />;
   }
 
-  const ProjectComponent = getProjectComponent(projectId);
+  const project = getProjectById(projectId);
 
-  if (!ProjectComponent) {
+  if (project === null) {
     return <Navigate to="/projects" replace />;
   }
 
-  return <ProjectComponent />;
+  return project.component;
 };
 
 export default ProjectPage;
