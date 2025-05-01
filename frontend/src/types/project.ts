@@ -1,11 +1,7 @@
 import React from 'react';
+import { ProjectConfig as SharedProjectConfig } from '../../../shared/types';
 
-export interface ProjectConfig {
-  id: string;
-  name: string;
-  description: string;
-  status: 'active' | 'inactive' | 'development';
-  permission: 'all' | 'logged-in-user-only' | 'admin-only';
-  component: JSX.Element,
+// Extend the shared ProjectConfig with frontend-specific properties
+export interface ProjectConfig extends SharedProjectConfig {
+  component: JSX.Element;
 }
-

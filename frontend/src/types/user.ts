@@ -1,5 +1,4 @@
-export interface UserData {
-  uid: string;
-  username: string;
-  isAdmin: boolean;
-}
+import { UserData as SharedUserData } from '../../../shared/types';
+
+// Re-export the shared UserData type
+export type UserData = SharedUserData;

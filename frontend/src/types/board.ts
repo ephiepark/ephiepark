@@ -1,19 +1,5 @@
-export interface Comment {
-  id: string;
-  postId: string;
-  content: string;
-  createdAt: number;
-  authorId: string;
-  authorName: string;
-}
+import { Comment as SharedComment, BoardPost as SharedBoardPost } from '../../../shared/types';
 
-export interface BoardPost {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: number;
-  authorId: string;
-  authorName: string;
-  isHidden: boolean;
-  commentCount: number;
-}
+// Re-export the shared types
+export type Comment = SharedComment;
+export type BoardPost = SharedBoardPost;
