@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BlogPost } from '../../../shared/types';
+import { BlogPost } from 'shared/types';
 import './Blog.css';
 
 const Blog: React.FC = () => {

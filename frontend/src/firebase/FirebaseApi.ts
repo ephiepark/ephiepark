@@ -2,7 +2,7 @@ import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, se
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, auth, googleProvider, functions } from './config';
-import { BlogPost, BoardPost, Comment, UserData } from '../../../shared/types';
+import { BlogPost, BoardPost, Comment, UserData, Emetric_Metric, Emetric_TimeSeries, EMETRIC_TIMESERIES_COLLECTION } from 'shared/types';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
@@ -280,6 +280,35 @@ class FirebaseApi {
     const functionRef = httpsCallable<any, T>(functions, name);
     const result = await functionRef(data);
     return result.data;
+  }
+
+  // Emetric methods
+  async getEmetricMetrics(): Promise<Emetric_Metric[]> {
+    try {
+      // For now, we'll import the metrics directly from the shared registry
+      // In a real app, you might want to fetch this from Firestore
+      const { metricRegistry } = await import('../../../shared/emetric/metricRegistry.js');
+      return metricRegistry;
+    } catch (error) {
+      console.error('Error fetching Emetric metrics:', error);
+      throw new Error('Failed to fetch metrics');
+    }
+  }
+
+  async getEmetricTimeSeries(metricId: string): Promise<Emetric_TimeSeries | null> {
+    try {
+      const docRef = doc(db, EMETRIC_TIMESERIES_COLLECTION, metricId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return null;
+      }
+
+      return docSnap.data() as Emetric_TimeSeries;
+    } catch (error) {
+      console.error(`Error fetching time series for metric ${metricId}:`, error);
+      throw new Error('Failed to fetch time series data');
+    }
   }
 }
 

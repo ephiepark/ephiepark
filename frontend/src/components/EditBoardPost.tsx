@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import FirebaseApi from '../firebase/FirebaseApi';
 import { useFirebase } from '../firebase/FirebaseContext';
-import { BoardPost } from '../../../shared/types';
+import { BoardPost } from 'shared/types';
 import './BlogEditor.css'; // Reusing blog editor styles
 
 const EditBoardPost: React.FC = () => {

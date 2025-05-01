@@ -1,0 +1,173 @@
+/* Emetric Project Styles */
+.emetric-project-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.emetric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.add-graph-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.add-graph-button:hover {
+  background-color: #1557b0;
+}
+
+.add-graph-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Graph Container Styles */
+.graphs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.graph-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.graph-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .graph-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-area {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 1rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metrics-area {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* TimeSeriesChart Styles */
+.time-series-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.time-series-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* MetricsList Styles */
+.metrics-list h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.metrics-list-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.metric-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.metric-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.metric-checkbox {
+  margin-top: 0.25rem;
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.metric-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.metric-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+}
+
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff6b6b;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
