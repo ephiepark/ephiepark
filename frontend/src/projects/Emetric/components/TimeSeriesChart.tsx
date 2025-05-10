@@ -80,7 +80,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
           data={chartData}
           margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
           <XAxis 
             dataKey="timestamp" 
             tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
