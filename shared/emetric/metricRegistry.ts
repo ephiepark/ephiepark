@@ -20,4 +20,14 @@ export const metricRegistry: Array<Emetric_Metric> = [
       source: "FRED"
     }
   },
+  {
+    id: "fred_us_debt_gdp_ratio_id",
+    name: "Federal Debt to GDP Ratio",
+    description: "Ratio of federal debt held by the public to Gross Domestic Product",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "FRED"
+    }
+  }
 ];
