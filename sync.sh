@@ -1,2 +1,2 @@
-cp -rf ./shared ./frontend/src/shared
-cp -rf ./shared ./functions/src/shared
+cp -rf ./shared ./frontend/src
+cp -rf ./shared ./functions/src

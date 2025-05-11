@@ -18,7 +18,9 @@ export const populateDailyEmetricData = onSchedule({
 
     const db = getFirestore();
     const dailyMetricList = metricRegistry.filter(metric => metric.updateCycle === 'daily');
+    logger.info("Metric registry / Daily Metric List", metricRegistry, dailyMetricList);
     const awaitables = dailyMetricList.map(async (metric) => {
+      logger.info("Process metric id", metric.id, metric);
       if (metric.id in metricBuilderRegistry) {
         const asyncMetricBuilder = metricBuilderRegistry[metric.id];
         await asyncMetricBuilder(db, metric);
