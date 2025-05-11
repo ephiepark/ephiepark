@@ -29,5 +29,15 @@ export const metricRegistry: Array<Emetric_Metric> = [
     metadata: {
       source: "FRED"
     }
-  }
+  },
+  {
+    id: "treasury_treasury_bond_avg_interest_rates",
+    name: "Treasury Bond Average Interest Rate",
+    description: "Treasury Bond Average Interest Rate",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "Treasury"
+    } 
+  },
 ];
