@@ -197,6 +197,8 @@
   gap: 1rem;
   font-size: 0.8rem;
   color: var(--text-secondary);
+  opacity: 1;
+  margin-top: 0.25rem;
 }
 
 .loading-indicator {
