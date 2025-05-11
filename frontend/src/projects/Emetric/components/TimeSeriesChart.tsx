@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   LineChart, 
@@ -11,7 +12,6 @@ import {
 } from 'recharts';
 import {Emetric_TimeSeries, Emetric_Metric} from '../../../shared/types';
 
-// Define colors for different metrics
 const CHART_COLORS = [
   '#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088fe',
   '#00c49f', '#ffbb28', '#ff8042', '#a4de6c', '#d0ed57'
@@ -28,7 +28,6 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   metrics, 
   selectedMetrics 
 }) => {
-  // If no metrics are selected, show a message
   if (selectedMetrics.length === 0) {
     return (
       <div className="time-series-chart-empty">
@@ -37,7 +36,6 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
     );
   }
 
-  // If no data is available for the selected metrics, show a message
   const hasData = selectedMetrics.some(id => 
     { 
       if (id in timeSeriesData) {
@@ -58,19 +56,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
     );
   }
 
-  // Prepare data for the chart
-  // We need to merge all time series data into a single array of data points
-  // Each data point will have a timestamp and values for each selected metric
   const chartData = prepareChartData(timeSeriesData, selectedMetrics);
-
-  // Get the unit for each metric to display on the Y-axis
-  const metricUnits = selectedMetrics.map(id => {
-    const metric = metrics.find(m => m.id === id);
-    return metric ? metric.unit : '';
-  });
-
-  // Check if all selected metrics have the same unit
-  const allSameUnit = metricUnits.every(unit => unit === metricUnits[0]);
 
   return (
     <div className="time-series-chart">
@@ -78,20 +64,29 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         <LineChart
           width={500}
           data={chartData}
-          margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+          margin={{ top: 5, right: 50, left: 10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
           <XAxis 
             dataKey="timestamp" 
             tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
           />
-          <YAxis 
-            label={{ 
-              value: allSameUnit ? metricUnits[0] : 'Value', 
-              angle: -90, 
-              position: 'insideLeft' 
-            }} 
-          />
+          {selectedMetrics.map((metricId, index) => {
+            const metric = metrics.find(m => m.id === metricId);
+            return (
+              <YAxis 
+                key={metricId}
+                yAxisId={metricId}
+                orientation={index === 0 ? "left" : "right"}
+                label={{ 
+                  value: metric?.unit || '', 
+                  angle: -90, 
+                  position: 'insideLeft' 
+                }}
+                stroke={CHART_COLORS[index % CHART_COLORS.length]}
+              />
+            );
+          })}
           <Tooltip 
             labelFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
             formatter={(value, name) => {
@@ -105,6 +100,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
               key={metricId}
               type="monotone"
               dataKey={metricId}
+              yAxisId={metricId}
               stroke={CHART_COLORS[index % CHART_COLORS.length]}
               activeDot={{ r: 8 }}
               name={metrics.find(m => m.id === metricId)?.name || metricId}
@@ -116,27 +112,23 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   );
 };
 
-// Helper function to prepare data for the chart
 const prepareChartData = (
   timeSeriesData: Record<string, Emetric_TimeSeries | null>,
   selectedMetrics: string[]
 ) => {
-  // Get all timestamps from all selected metrics
   const allTimestamps = new Set<number>();
   
   selectedMetrics.forEach(metricId => {
     const timeSeries = timeSeriesData[metricId];
     if (timeSeries) {
       timeSeries.entries.forEach(entry => {
-        allTimestamps.add(entry.timestamp * 1000); // Convert to milliseconds
+        allTimestamps.add(entry.timestamp * 1000);
       });
     }
   });
 
-  // Sort timestamps
   const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
-  // Create data points for each timestamp
   return sortedTimestamps.map(timestamp => {
     const dataPoint: Record<string, any> = { timestamp };
     
