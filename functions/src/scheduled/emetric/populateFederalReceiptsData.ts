@@ -11,34 +11,35 @@ import {
 // Configuration
 const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 
-// GDP metric definition
-const GDP_METRIC: FredMetric = {
-  sourceKey: "GDP", // FRED series ID for Gross Domestic Product
+// Federal Receipts metric definition
+const FEDERAL_RECEIPTS_METRIC: FredMetric = {
+  sourceKey: "FGRECPT", // FRED series ID for Federal Government Receipts
   frequency: "quarterly"
 };
 
 /**
- * Fetches GDP data from FRED and stores it in Firestore
+ * Fetches Federal Government Receipts data from FRED and stores it in Firestore
  * @param db - Firestore database instance
+ * @param metric - Metric configuration
  */
-export const asyncPopulateGDPData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {
+export const asyncPopulateFederalReceiptsData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {
   try {
-    logger.info("Starting GDP data population");
+    logger.info("Starting Federal Government Receipts data population");
 
     // Create FRED service instance
     const fredService = new FredService(FRED_API_KEY);
 
-    // Fetch GDP data from FRED
-    logger.info("Fetching GDP data from FRED");
-    const gdpData = await fredService.fetchMetricData(GDP_METRIC);
+    // Fetch Federal Receipts data from FRED
+    logger.info("Fetching Federal Government Receipts data from FRED");
+    const receiptsData = await fredService.fetchMetricData(FEDERAL_RECEIPTS_METRIC);
 
-    if (gdpData.length === 0) {
-      logger.warn("No GDP data returned from FRED");
+    if (receiptsData.length === 0) {
+      logger.warn("No Federal Government Receipts data returned from FRED");
       return;
     }
 
     // Transform data to Emetric format
-    const timeSeriesEntries: Emetric_TimeSeriesEntry[] = gdpData.map(item => ({
+    const timeSeriesEntries: Emetric_TimeSeriesEntry[] = receiptsData.map(item => ({
       timestamp: Math.floor(item.timestamp / 1000),
       value: item.value
     }));
@@ -52,9 +53,9 @@ export const asyncPopulateGDPData = async (db: Firestore, metric: Emetric_Metric
       entries: timeSeriesEntries
     } as Emetric_TimeSeries);
 
-    logger.info(`Successfully stored ${timeSeriesEntries.length} GDP data points`);
+    logger.info(`Successfully stored ${timeSeriesEntries.length} Federal Government Receipts data points`);
   } catch (error) {
-    logger.error("Error populating GDP data:", error);
+    logger.error("Error populating Federal Government Receipts data:", error);
     throw error;
   }
 };

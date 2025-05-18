@@ -4,7 +4,6 @@ import fetch from "node-fetch";
  * Interface for metric data used by FredService
  */
 export interface FredMetric {
-  id: string;
   sourceKey: string;
   frequency: string;
 }
@@ -13,7 +12,6 @@ export interface FredMetric {
  * Interface for metric data returned by FRED API
  */
 export interface FredMetricData {
-  metricId: string;
   timestamp: number;
   value: number;
 }
@@ -67,7 +65,6 @@ export class FredService {
     return data.observations
       .filter((obs) => obs.value !== ".") // Filter out missing values
       .map((obs) => ({
-        metricId: metric.id,
         timestamp: new Date(obs.date).getTime(),
         value: parseFloat(obs.value),
       }));

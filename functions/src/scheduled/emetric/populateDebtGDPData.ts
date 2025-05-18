@@ -12,7 +12,6 @@ import {
 const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 
 const DEBT_GDP_RATIO_METRIC: FredMetric = {
-  id: "fred_us_debt_gdp_ratio_id",
   sourceKey: "GFDEGDQ188S", // FRED series ID for Federal Debt to GDP
   frequency: "quarterly"
 };

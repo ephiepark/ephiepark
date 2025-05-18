@@ -40,4 +40,14 @@ export const metricRegistry: Array<Emetric_Metric> = [
       source: "Treasury"
     } 
   },
+  {
+    id: "fred_us_federal_receipts_id",
+    name: "Federal Government Receipts",
+    description: "Total receipts of the United States federal government; Total government revenue.",
+    updateCycle: "daily",
+    unit: "dollar",
+    metadata: {
+      source: "FRED"
+    }
+  },
 ];
