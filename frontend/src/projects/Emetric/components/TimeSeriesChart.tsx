@@ -58,6 +58,20 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
 
   const chartData = prepareChartData(timeSeriesData, selectedMetrics);
 
+  // Group metrics by unit
+  const metricsByUnit: Record<string, string[]> = {};
+  selectedMetrics.forEach(metricId => {
+    const metric = metrics.find(m => m.id === metricId);
+    const unit = metric?.unit || 'unknown';
+    if (!metricsByUnit[unit]) {
+      metricsByUnit[unit] = [];
+    }
+    metricsByUnit[unit].push(metricId);
+  });
+
+  // Create unique y-axes for each unit
+  const uniqueUnits = Object.keys(metricsByUnit);
+
   return (
     <div className="time-series-chart">
       <ResponsiveContainer width="100%" aspect={2} height={400}>
@@ -71,22 +85,19 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
             dataKey="timestamp" 
             tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
           />
-          {selectedMetrics.map((metricId, index) => {
-            const metric = metrics.find(m => m.id === metricId);
-            return (
-              <YAxis 
-                key={metricId}
-                yAxisId={metricId}
-                orientation={index === 0 ? "left" : "right"}
-                label={{ 
-                  value: metric?.unit || '', 
-                  angle: -90, 
-                  position: 'insideLeft' 
-                }}
-                stroke={CHART_COLORS[index % CHART_COLORS.length]}
-              />
-            );
-          })}
+          {uniqueUnits.map((unit, index) => (
+            <YAxis 
+              key={unit}
+              yAxisId={unit}
+              orientation={index === 0 ? "left" : "right"}
+              label={{ 
+                value: unit, 
+                angle: -90, 
+                position: 'insideLeft' 
+              }}
+              stroke={CHART_COLORS[index % CHART_COLORS.length]}
+            />
+          ))}
           <Tooltip 
             labelFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
             formatter={(value, name) => {
@@ -95,17 +106,20 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
             }}
           />
           <Legend />
-          {selectedMetrics.map((metricId, index) => (
-            <Line
-              key={metricId}
-              type="monotone"
-              dataKey={metricId}
-              yAxisId={metricId}
-              stroke={CHART_COLORS[index % CHART_COLORS.length]}
-              activeDot={{ r: 8 }}
-              name={metrics.find(m => m.id === metricId)?.name || metricId}
-            />
-          ))}
+          {selectedMetrics.map((metricId, index) => {
+            const metric = metrics.find(m => m.id === metricId);
+            return (
+              <Line
+                key={metricId}
+                type="monotone"
+                dataKey={metricId}
+                yAxisId={metric?.unit || 'unknown'}
+                stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                activeDot={{ r: 8 }}
+                name={metric?.name || metricId}
+              />
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
     </div>
