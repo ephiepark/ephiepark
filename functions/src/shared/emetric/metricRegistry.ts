@@ -43,7 +43,17 @@ export const metricRegistry: Array<Emetric_Metric> = [
   {
     id: "fred_us_federal_receipts_id",
     name: "Federal Government Receipts",
-    description: "Total receipts of the United States federal government; Total government revenue.",
+    description: "Total receipts of the United States federal government. Total government revenue.",
+    updateCycle: "daily",
+    unit: "dollar",
+    metadata: {
+      source: "FRED"
+    }
+  },
+  {
+    id: "fred_us_federal_expenditures_id",
+    name: "Federal Government Expenditures",
+    description: "Total expenditures of the United States federal government. Total government spending.",
     updateCycle: "daily",
     unit: "dollar",
     metadata: {
