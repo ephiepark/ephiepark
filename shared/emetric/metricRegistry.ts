@@ -21,6 +21,16 @@ export const metricRegistry: Array<Emetric_Metric> = [
     }
   },
   {
+    id: "fred_us_interest_payments_id",
+    name: "Federal Interest Payments",
+    description: "Federal government current expenditures on interest payments",
+    updateCycle: "daily",
+    unit: "dollar",
+    metadata: {
+      source: "FRED"
+    }
+  },
+  {
     id: "fred_us_debt_gdp_ratio_id",
     name: "Federal Debt to GDP Ratio",
     description: "Ratio of federal debt held by the public to Gross Domestic Product",
