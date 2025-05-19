@@ -41,7 +41,7 @@ export const asyncPopulateInterestPaymentsData = async (db: Firestore, metric: E
     // Transform data to Emetric format
     const timeSeriesEntries: Emetric_TimeSeriesEntry[] = interestPaymentsData.map(item => ({
       timestamp: Math.floor(item.timestamp / 1000),
-      value: item.value * 1000000000 // Convert billions to dollars
+      value: item.value,
     }));
 
     // Store time series data in Firestore

@@ -15,7 +15,7 @@ export const metricRegistry: Array<Emetric_Metric> = [
     name: "Gross Domestic Product",
     description: "The total value of goods produced and services provided in the United States",
     updateCycle: "daily",
-    unit: "dollar",
+    unit: "billions of dollars",
     metadata: {
       source: "FRED"
     }
@@ -25,7 +25,7 @@ export const metricRegistry: Array<Emetric_Metric> = [
     name: "Federal Interest Payments",
     description: "Federal government current expenditures on interest payments",
     updateCycle: "daily",
-    unit: "dollar",
+    unit: "billions of dollars",
     metadata: {
       source: "FRED"
     }
@@ -55,7 +55,7 @@ export const metricRegistry: Array<Emetric_Metric> = [
     name: "Federal Government Receipts",
     description: "Total receipts of the United States federal government. Total government revenue.",
     updateCycle: "daily",
-    unit: "dollar",
+    unit: "billions of dollars",
     metadata: {
       source: "FRED"
     }
@@ -65,7 +65,7 @@ export const metricRegistry: Array<Emetric_Metric> = [
     name: "Federal Government Expenditures",
     description: "Total expenditures of the United States federal government. Total government spending.",
     updateCycle: "daily",
-    unit: "dollar",
+    unit: "billions of dollars",
     metadata: {
       source: "FRED"
     }
