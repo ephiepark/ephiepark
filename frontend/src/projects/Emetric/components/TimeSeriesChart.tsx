@@ -8,9 +8,57 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer 
+  ResponsiveContainer
 } from 'recharts';
 import {Emetric_TimeSeries, Emetric_Metric} from '../../../shared/types';
+
+// Helper function to format date as YYYY-MM-DD
+const formatDateToYYYYMMDD = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD part from ISO string
+};
+
+// Custom tooltip component to ensure date is visible
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: any;
+  metrics: Emetric_Metric[];
+}
+
+const CustomTooltip = ({ active, payload, label, metrics }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ 
+        backgroundColor: '#1a1a1a', 
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        padding: '10px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.5)'
+      }}>
+        <p style={{ 
+          color: 'rgba(255, 255, 255, 0.95)', 
+          margin: '0 0 5px 0',
+          fontWeight: 'bold'
+        }}>
+          Date: {formatDateToYYYYMMDD(label as number)}
+        </p>
+        {payload && payload.map((entry: any, index: number) => {
+          const metric = metrics.find((m: Emetric_Metric) => m.id === entry.dataKey);
+          return (
+            <p key={`item-${index}`} style={{ 
+              color: entry.color,
+              margin: '3px 0' 
+            }}>
+              {`${metric?.name || entry.name}: ${entry.value} ${metric?.unit || ''}`}
+            </p>
+          );
+        })}
+      </div>
+    );
+  }
+  return null;
+};
 
 const CHART_COLORS = [
   '#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088fe',
@@ -98,13 +146,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
               stroke={CHART_COLORS[index % CHART_COLORS.length]}
             />
           ))}
-          <Tooltip 
-            labelFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
-            formatter={(value, name) => {
-              const metric = metrics.find(m => m.id === name);
-              return [`${value} ${metric?.unit || ''}`, metric?.name || name];
-            }}
-          />
+          <Tooltip content={<CustomTooltip metrics={metrics} />} />
           <Legend />
           {selectedMetrics.map((metricId, index) => {
             const metric = metrics.find(m => m.id === metricId);
