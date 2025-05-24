@@ -5,7 +5,6 @@ import fetch from "node-fetch";
  */
 export interface FredMetric {
   sourceKey: string;
-  frequency: string;
 }
 
 /**
@@ -51,9 +50,12 @@ export class FredService {
       series_id: metric.sourceKey,
       api_key: this.config.apiKey,
       file_type: "json",
-      observation_start: startDate || this.getStartDate(metric.frequency),
       observation_end: new Date().toISOString().split("T")[0],
     });
+    if (startDate) {
+      params.append('observation_start', startDate);
+    }
+    
 
     const response = await fetch(`${this.config.baseUrl}/observations?${params.toString()}`);
     
@@ -69,38 +71,6 @@ export class FredService {
         timestamp: new Date(obs.date).getTime(),
         value: parseFloat(obs.value),
       }));
-  }
-
-  /**
-   * Gets the start date for data fetching based on frequency
-   * @param frequency - The data frequency
-   * @return The start date in ISO format
-   */
-  private getStartDate(frequency: string): string {
-    const now = new Date();
-    const date = new Date(now);
-
-    switch (frequency) {
-      case "daily":
-        date.setMonth(now.getMonth() - 3); // Last 3 months
-        break;
-      case "weekly":
-        date.setMonth(now.getMonth() - 6); // Last 6 months
-        break;
-      case "monthly":
-        date.setFullYear(now.getFullYear() - 2); // Last 2 years
-        break;
-      case "quarterly":
-        date.setFullYear(now.getFullYear() - 5); // Last 5 years
-        break;
-      case "yearly":
-        date.setFullYear(now.getFullYear() - 10); // Last 10 years
-        break;
-      default:
-        date.setFullYear(now.getFullYear() - 1); // Default to 1 year
-    }
-
-    return date.toISOString().split("T")[0];
   }
 
   /**

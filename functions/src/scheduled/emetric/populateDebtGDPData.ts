@@ -14,7 +14,6 @@ const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 
 const DEBT_GDP_RATIO_METRIC: FredMetric = {
   sourceKey: "GFDEGDQ188S", // FRED series ID for Federal Debt to GDP
-  frequency: "quarterly"
 };
 
 export const asyncPopulateDebtGDPData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {

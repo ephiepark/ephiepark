@@ -15,7 +15,6 @@ const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 // Federal Expenditures metric definition
 const FEDERAL_EXPENDITURES_METRIC: FredMetric = {
   sourceKey: "FGEXPND", // FRED series ID for Federal Government Expenditures
-  frequency: "quarterly"
 };
 
 /**

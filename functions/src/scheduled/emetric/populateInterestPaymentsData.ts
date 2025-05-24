@@ -15,7 +15,6 @@ const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 // Interest Payments metric definition
 const INTEREST_PAYMENTS_METRIC: FredMetric = {
   sourceKey: "A091RC1Q027SBEA", // FRED series ID for Federal government current expenditures: Interest payments
-  frequency: "quarterly"
 };
 
 /**

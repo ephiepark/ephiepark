@@ -15,7 +15,6 @@ const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 // Federal Receipts metric definition
 const FEDERAL_RECEIPTS_METRIC: FredMetric = {
   sourceKey: "FGRECPT", // FRED series ID for Federal Government Receipts
-  frequency: "quarterly"
 };
 
 /**

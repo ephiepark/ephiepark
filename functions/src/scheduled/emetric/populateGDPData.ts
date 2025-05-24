@@ -15,7 +15,6 @@ const FRED_API_KEY = "9a76767a206fcd5664b94fe515d67260";
 // GDP metric definition
 const GDP_METRIC: FredMetric = {
   sourceKey: "GDP", // FRED series ID for Gross Domestic Product
-  frequency: "quarterly"
 };
 
 /**
