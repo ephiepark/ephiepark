@@ -39,9 +39,10 @@ export class FredService {
   /**
    * Fetches metric data from FRED API
    * @param metric - The metric to fetch data for
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
    */
-  async fetchMetricData(metric: FredMetric): Promise<FredMetricData[]> {
+  async fetchMetricData(metric: FredMetric, startDate?: string): Promise<FredMetricData[]> {
     if (!metric.sourceKey) {
       throw new Error("FRED series ID (sourceKey) is required");
     }
@@ -50,7 +51,7 @@ export class FredService {
       series_id: metric.sourceKey,
       api_key: this.config.apiKey,
       file_type: "json",
-      observation_start: this.getStartDate(metric.frequency),
+      observation_start: startDate || this.getStartDate(metric.frequency),
       observation_end: new Date().toISOString().split("T")[0],
     });
 

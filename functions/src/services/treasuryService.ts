@@ -27,12 +27,14 @@ export class TreasuryService {
 
   /**
    * Fetches Treasury Bond Average Interest Rate data
-   * @param metric - The metric to fetch data for
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
    */
-  async fetchTreasuryBondAvgInterestRateData(): Promise<TreasuryMetricData[]> {
+  async fetchTreasuryBondAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
     const endpoint = "/accounting/od/avg_interest_rates";
-    const filter = "security_desc:eq:Treasury%20Bonds";
+    const filter = startDate 
+      ? `security_desc:eq:Treasury%20Bonds,record_date:gte:${startDate}`
+      : "security_desc:eq:Treasury%20Bonds";
     const pageSize = 1000;
     
     const url = `${this.config.baseUrl}${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
