@@ -1,4 +1,69 @@
 /* Emetric Project Styles */
+
+/* Navigation Bar Styles */
+.emetric-navbar {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.emetric-navbar-items {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem;
+}
+
+.emetric-navbar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.emetric-navbar-item:hover:not(.disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.emetric-navbar-item.active {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.emetric-navbar-item.active:hover {
+  background-color: #1557b0;
+}
+
+.emetric-navbar-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.emetric-navbar-icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 768px) {
+  .emetric-navbar-items {
+    justify-content: space-between;
+  }
+  
+  .emetric-navbar-item {
+    padding: 0.75rem 1rem;
+  }
+}
 .emetric-project-container {
   padding: 2rem;
   max-width: 1200px;
@@ -10,6 +75,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+}
+
+.emetric-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 
 .add-graph-button {

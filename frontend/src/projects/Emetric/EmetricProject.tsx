@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Graph from './components/Graph';
+import EmetricNavBar from './components/EmetricNavBar';
 import './Emetric.css';
 
 const EmetricProject: React.FC = () => {
   const [graphs, setGraphs] = useState<string[]>(['graph-1']);
+  const [activeView, setActiveView] = useState<string>('dashboard');
 
   const handleAddGraph = () => {
     const newGraphId = `graph-${graphs.length + 1}`;
@@ -14,10 +16,19 @@ const EmetricProject: React.FC = () => {
     setGraphs(graphs.filter(graphId => graphId !== graphIdToRemove));
   };
 
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+  };
+
   return (
     <div className="emetric-project-container">
       <div className="emetric-header">
         <h1>Emetric Project</h1>
+      </div>
+      
+      <EmetricNavBar activeView={activeView} onViewChange={handleViewChange} />
+      
+      <div className="emetric-actions">
         <button className="add-graph-button" onClick={handleAddGraph}>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
