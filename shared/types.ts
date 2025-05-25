@@ -71,3 +71,13 @@ export type Emetric_TimeSeries = {
   id: string;
   entries: Array<Emetric_TimeSeriesEntry>;
 };
+
+// Formula would be string combination of +, -, /, *, (, ), {{timeseries_id}}
+// For example, '{{fred_us_interest_payments_id}} / {{fred_us_federal_expenditures_id}}' 
+// to calculate % of interest payment out of overall expenditure
+export type Emetric_Derived_Timeseries_Definition = {
+  id: string;
+  description: string;
+  alignmentStrategy: 'previous' | 'future' | 'nearest' | 'interpolate';
+  formula: string;
+};
