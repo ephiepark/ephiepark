@@ -289,3 +289,309 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+
+/* Metric Explorer Styles */
+.metric-explorer-container {
+  width: 100%;
+}
+
+.metric-explorer-header {
+  margin-bottom: 2rem;
+}
+
+.metric-explorer-description {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.metric-explorer-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .metric-explorer-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metrics-catalog {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metrics-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.metric-card {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.metric-card:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+  transform: translateY(-2px);
+}
+
+.metric-card.selected {
+  border-color: #1a73e8;
+  background-color: rgba(26, 115, 232, 0.1);
+}
+
+.metric-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metric-detail-panel {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-detail-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-secondary);
+}
+
+.metric-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metric-detail-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.metric-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.derived-timeseries-section {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.derived-timeseries-creator {
+  margin-top: 1rem;
+}
+
+.derived-timeseries-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+}
+
+.form-control {
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.form-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.save-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.save-button:hover {
+  background-color: #1557b0;
+}
+
+.save-button:disabled {
+  background-color: rgba(26, 115, 232, 0.5);
+  cursor: not-allowed;
+}
+
+.success-message {
+  background-color: rgba(0, 255, 0, 0.1);
+  color: #4caf50;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Formula Builder Styles */
+.formula-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.formula-preview {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 1rem;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.formula-display {
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.formula-placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.formula-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.metric-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-metric-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.add-metric-button:disabled {
+  background-color: rgba(26, 115, 232, 0.5);
+  cursor: not-allowed;
+}
+
+.operator-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.operator-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.operator-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.clear-button {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.clear-button:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.formula-help {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.formula-help h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.formula-help ul {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.formula-help code {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: monospace;
+}

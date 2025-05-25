@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
+import MetricExplorer from './components/MetricExplorer';
 import './Emetric.css';
 
 const EmetricProject: React.FC = () => {
@@ -20,6 +21,46 @@ const EmetricProject: React.FC = () => {
     setActiveView(view);
   };
 
+  const renderContent = () => {
+    switch (activeView) {
+      case 'metrics-explorer':
+        return <MetricExplorer />;
+      case 'dashboard':
+      default:
+        return (
+          <>
+            <div className="emetric-actions">
+              <button className="add-graph-button" onClick={handleAddGraph}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Add Graph
+              </button>
+            </div>
+            
+            <div className="graphs-container">
+              {graphs.map(graphId => (
+                <div key={graphId} className="graph-wrapper">
+                  <div className="graph-header">
+                    <button 
+                      className="remove-graph-button" 
+                      onClick={() => handleRemoveGraph(graphId)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                      </svg>
+                      Remove
+                    </button>
+                  </div>
+                  <Graph id={graphId} />
+                </div>
+              ))}
+            </div>
+          </>
+        );
+    }
+  };
+
   return (
     <div className="emetric-project-container">
       <div className="emetric-header">
@@ -28,33 +69,7 @@ const EmetricProject: React.FC = () => {
       
       <EmetricNavBar activeView={activeView} onViewChange={handleViewChange} />
       
-      <div className="emetric-actions">
-        <button className="add-graph-button" onClick={handleAddGraph}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          Add Graph
-        </button>
-      </div>
-      
-      <div className="graphs-container">
-        {graphs.map(graphId => (
-          <div key={graphId} className="graph-wrapper">
-            <div className="graph-header">
-              <button 
-                className="remove-graph-button" 
-                onClick={() => handleRemoveGraph(graphId)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                </svg>
-                Remove
-              </button>
-            </div>
-            <Graph id={graphId} />
-          </div>
-        ))}
-      </div>
+      {renderContent()}
     </div>
   );
 };

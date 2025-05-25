@@ -2,7 +2,16 @@ import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, se
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, auth, googleProvider, functions } from './config';
-import { BlogPost, BoardPost, Comment, UserData, Emetric_Metric, Emetric_TimeSeries, EMETRIC_TIMESERIES_COLLECTION } from '../shared/types';
+import { 
+  BlogPost, 
+  BoardPost, 
+  Comment, 
+  UserData, 
+  Emetric_Metric, 
+  Emetric_TimeSeries, 
+  EMETRIC_TIMESERIES_COLLECTION,
+  Emetric_Derived_Timeseries_Definition 
+} from '../shared/types';
 
 class FirebaseApi {
   private static instance: FirebaseApi;
@@ -283,6 +292,8 @@ class FirebaseApi {
   }
 
   // Emetric methods
+  private readonly DERIVED_TIMESERIES_DEFINITIONS_COLLECTION = 'emetric_derived_timeseries_definitions';
+
   async getEmetricTimeSeries(metricId: string): Promise<Emetric_TimeSeries | null> {
     try {
       const docRef = doc(db, EMETRIC_TIMESERIES_COLLECTION, metricId);
@@ -296,6 +307,28 @@ class FirebaseApi {
     } catch (error) {
       console.error(`Error fetching time series for metric ${metricId}:`, error);
       throw new Error('Failed to fetch time series data');
+    }
+  }
+
+  async saveDerivedTimeSeriesDefinition(definition: Emetric_Derived_Timeseries_Definition): Promise<string> {
+    try {
+      // Save the definition to Firestore
+      const docRef = doc(db, this.DERIVED_TIMESERIES_DEFINITIONS_COLLECTION, definition.id);
+      await setDoc(docRef, definition);
+      return definition.id;
+    } catch (error) {
+      console.error('Error saving derived time series definition:', error);
+      throw new Error('Failed to save derived time series definition');
+    }
+  }
+
+  async getDerivedTimeSeriesDefinitions(): Promise<Emetric_Derived_Timeseries_Definition[]> {
+    try {
+      const querySnapshot = await getDocs(collection(db, this.DERIVED_TIMESERIES_DEFINITIONS_COLLECTION));
+      return querySnapshot.docs.map(doc => doc.data() as Emetric_Derived_Timeseries_Definition);
+    } catch (error) {
+      console.error('Error fetching derived time series definitions:', error);
+      throw new Error('Failed to fetch derived time series definitions');
     }
   }
 }
