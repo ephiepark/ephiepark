@@ -27,24 +27,6 @@ const EmetricNavBar: React.FC<EmetricNavBarProps> = ({ activeView, onViewChange 
           </svg>
           Metrics Explorer
         </button>
-        <button 
-          className="emetric-navbar-item disabled"
-          disabled
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="emetric-navbar-icon">
-            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-7-3-7 3zm2-3.5l5-2.14 5 2.14V5H7v12.5z"/>
-          </svg>
-          Analysis
-        </button>
-        <button 
-          className="emetric-navbar-item disabled"
-          disabled
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="emetric-navbar-icon">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-          </svg>
-          About
-        </button>
       </div>
     </div>
   );
