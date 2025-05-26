@@ -3,6 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { metricRegistry } from "../../shared/emetric/metricRegistry.js";
 import { metricBuilderRegistry } from "./metricBuilderRegistry.js";
+import { calculateDerivedMetrics } from "./populateDerivedMetricData.js";
 
 /**
  * Scheduled function that runs daily to update emetric data
@@ -27,6 +28,10 @@ export const populateDailyEmetricData = onSchedule({
       }
     });
     await Promise.all(awaitables);
+
+    // Calculate derived metric values
+    logger.info("Starting derived metric calculation");
+    await calculateDerivedMetrics(db);
     
     logger.info("Emetric daily data population job completed successfully");
     return;
