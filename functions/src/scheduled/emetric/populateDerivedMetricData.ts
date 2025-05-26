@@ -6,7 +6,7 @@ import {
   Emetric_TimeSeries,
   Emetric_TimeSeriesEntry
 } from "../../shared/types.js";
-import { getExistingEntries } from "../../shared/emetric/utils.js";
+import { getExistingEntries, getLatestTimestamp } from "../../shared/emetric/utils.js";
 
 // Collection name for derived time series definitions
 const DERIVED_TIMESERIES_DEFINITIONS_COLLECTION = "emetric_derived_timeseries_definitions";
@@ -165,6 +165,7 @@ function topologicalSort(graph: DependencyGraph): string[] {
 
 /**
  * Calculates a single derived metric based on its formula and dependencies
+ * Only calculates values for timestamps after the latest existing timestamp
  * @param db - Firestore database instance
  * @param definition - Derived time series definition
  * @param graph - Dependency graph
@@ -177,7 +178,16 @@ async function calculateDerivedMetric(
   try {
     logger.info(`Calculating derived metric: ${definition.id}`);
     
-    // 1. Get all dependent time series data
+    // 1. Get the latest timestamp from existing data
+    const latestTimestamp = await getLatestTimestamp(db, definition.id);
+    
+    if (latestTimestamp) {
+      logger.info(`Found latest timestamp for metric ${definition.id}: ${new Date(latestTimestamp * 1000).toISOString()}`);
+    } else {
+      logger.info(`No existing data found for metric ${definition.id}`);
+    }
+    
+    // 2. Get all dependent time series data
     const dependencies = graph[definition.id].dependencies;
     const dependentData: Record<string, Emetric_TimeSeriesEntry[]> = {};
     
@@ -190,19 +200,31 @@ async function calculateDerivedMetric(
       dependentData[depId] = entries;
     }
     
-    // 2. Determine all unique timestamps across all dependencies
+    // 3. Determine all unique timestamps across all dependencies
     const allTimestamps = getAllUniqueTimestamps(dependentData);
-    logger.info(`Found ${allTimestamps.length} unique timestamps for metric ${definition.id}`);
+    logger.info(`Found ${allTimestamps.length} unique timestamps across dependencies for metric ${definition.id}`);
     
     if (allTimestamps.length === 0) {
       logger.warn(`No timestamps found for metric ${definition.id}`);
       return;
     }
     
-    // 3. Calculate values for each timestamp
-    const calculatedEntries: Emetric_TimeSeriesEntry[] = [];
+    // 4. Filter timestamps to only include those after the latest timestamp
+    const timestampsToCalculate = latestTimestamp 
+      ? allTimestamps.filter(timestamp => timestamp > latestTimestamp)
+      : allTimestamps;
     
-    for (const timestamp of allTimestamps) {
+    logger.info(`Need to calculate ${timestampsToCalculate.length} new timestamps for metric ${definition.id}`);
+    
+    if (timestampsToCalculate.length === 0) {
+      logger.info(`No new timestamps to calculate for metric ${definition.id}`);
+      return;
+    }
+    
+    // 5. Calculate values only for timestamps after the latest timestamp
+    const newCalculatedEntries: Emetric_TimeSeriesEntry[] = [];
+    
+    for (const timestamp of timestampsToCalculate) {
       try {
         const value = calculateValueForTimestamp(
           timestamp,
@@ -211,7 +233,7 @@ async function calculateDerivedMetric(
           definition.alignmentStrategy
         );
         
-        calculatedEntries.push({
+        newCalculatedEntries.push({
           timestamp,
           value
         });
@@ -221,18 +243,26 @@ async function calculateDerivedMetric(
       }
     }
     
-    // 4. Store the calculated entries
-    if (calculatedEntries.length > 0) {
-      const timeSeriesRef = db.collection(EMETRIC_TIMESERIES_COLLECTION).doc(definition.id);
-      await timeSeriesRef.set({
-        id: definition.id,
-        entries: calculatedEntries
-      } as Emetric_TimeSeries);
-      
-      logger.info(`Successfully stored ${calculatedEntries.length} calculated entries for metric ${definition.id}`);
-    } else {
-      logger.warn(`No entries calculated for metric ${definition.id}`);
+    if (newCalculatedEntries.length === 0) {
+      logger.warn(`No new entries calculated for metric ${definition.id}`);
+      return;
     }
+    
+    // 6. Get existing entries and combine with new entries
+    const existingEntries = await getExistingEntries(db, definition.id);
+    const combinedEntries = [...existingEntries, ...newCalculatedEntries];
+    
+    // Sort entries by timestamp for consistency
+    combinedEntries.sort((a, b) => a.timestamp - b.timestamp);
+    
+    // 7. Store the combined entries
+    const timeSeriesRef = db.collection(EMETRIC_TIMESERIES_COLLECTION).doc(definition.id);
+    await timeSeriesRef.set({
+      id: definition.id,
+      entries: combinedEntries
+    } as Emetric_TimeSeries);
+    
+    logger.info(`Successfully added ${newCalculatedEntries.length} new calculated entries to existing ${existingEntries.length} entries for metric ${definition.id}`);
   } catch (error) {
     logger.error(`Error calculating derived metric ${definition.id}:`, error);
     throw error;
