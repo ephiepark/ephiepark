@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { metricRegistry } from '../../../shared/emetric/metricRegistry';
-import { Emetric_Metric } from '../../../shared/types';
+import { Emetric_Metric, Emetric_Derived_Timeseries_Definition } from '../../../shared/types';
 import DerivedTimeSeriesCreator from './DerivedTimeSeriesCreator';
+import FirebaseApi from '../../../firebase/FirebaseApi';
 
 const MetricExplorer: React.FC = () => {
   const [selectedMetric, setSelectedMetric] = useState<Emetric_Metric | null>(null);
-  const metrics = metricRegistry;
+  const [derivedMetrics, setDerivedMetrics] = useState<Emetric_Metric[]>([]);
+  const [allMetrics, setAllMetrics] = useState<Emetric_Metric[]>(metricRegistry);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch derived time series definitions when component mounts
+  useEffect(() => {
+    const fetchDerivedTimeSeriesDefinitions = async () => {
+      try {
+        setLoading(true);
+        const api = FirebaseApi.getInstance();
+        const definitions = await api.getDerivedTimeSeriesDefinitions();
+        
+        // Extract metrics from definitions
+        const derivedMetricsFromDefinitions = definitions.map(def => def.metric);
+        setDerivedMetrics(derivedMetricsFromDefinitions);
+        
+        // Combine regular metrics with derived metrics
+        setAllMetrics([...metricRegistry, ...derivedMetricsFromDefinitions]);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching derived time series definitions:', err);
+        setError('Failed to load derived time series definitions. Please try again later.');
+        setLoading(false);
+      }
+    };
+
+    fetchDerivedTimeSeriesDefinitions();
+  }, []);
 
   const handleMetricSelect = (metric: Emetric_Metric) => {
     setSelectedMetric(metric);
@@ -24,7 +53,11 @@ const MetricExplorer: React.FC = () => {
         <div className="metrics-catalog">
           <h3>Available Metrics</h3>
           <div className="metrics-list-container">
-            {metrics.map(metric => (
+            {loading ? (
+              <div className="loading-indicator">Loading metrics...</div>
+            ) : error ? (
+              <div className="error-message">{error}</div>
+            ) : allMetrics.map(metric => (
               <div 
                 key={metric.id} 
                 className={`metric-card ${selectedMetric?.id === metric.id ? 'selected' : ''}`}
@@ -74,7 +107,7 @@ const MetricExplorer: React.FC = () => {
 
       <div className="derived-timeseries-section">
         <h3>Create Derived Time Series</h3>
-        <DerivedTimeSeriesCreator metrics={metrics} />
+        <DerivedTimeSeriesCreator metrics={allMetrics} />
       </div>
     </div>
   );

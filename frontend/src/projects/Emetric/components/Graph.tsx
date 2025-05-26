@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MetricsList from './MetricsList';
 import TimeSeriesChart from './TimeSeriesChart';
 import FirebaseApi from '../../../firebase/FirebaseApi';
-import {Emetric_Metric, Emetric_TimeSeries} from '../../../shared/types';
+import {Emetric_Metric, Emetric_TimeSeries, Emetric_Derived_Timeseries_Definition} from '../../../shared/types';
 import { metricRegistry } from '../../../shared/emetric/metricRegistry';
 
 // Define types locally to avoid import issues
@@ -15,7 +15,30 @@ const Graph: React.FC<GraphProps> = ({ id }) => {
   const [timeSeriesData, setTimeSeriesData] = useState<Record<string, Emetric_TimeSeries | null>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const metrics = metricRegistry;
+  const [derivedMetrics, setDerivedMetrics] = useState<Emetric_Metric[]>([]);
+  const [allMetrics, setAllMetrics] = useState<Emetric_Metric[]>(metricRegistry);
+
+  // Fetch derived time series definitions when component mounts
+  useEffect(() => {
+    const fetchDerivedTimeSeriesDefinitions = async () => {
+      try {
+        const api = FirebaseApi.getInstance();
+        const definitions = await api.getDerivedTimeSeriesDefinitions();
+        
+        // Extract metrics from definitions
+        const derivedMetricsFromDefinitions = definitions.map(def => def.metric);
+        setDerivedMetrics(derivedMetricsFromDefinitions);
+        
+        // Combine regular metrics with derived metrics
+        setAllMetrics([...metricRegistry, ...derivedMetricsFromDefinitions]);
+      } catch (err) {
+        console.error('Error fetching derived time series definitions:', err);
+        setError('Failed to load derived time series definitions. Please try again later.');
+      }
+    };
+
+    fetchDerivedTimeSeriesDefinitions();
+  }, []);
 
   // Fetch time series data when selected metrics change
   useEffect(() => {
@@ -79,18 +102,18 @@ const Graph: React.FC<GraphProps> = ({ id }) => {
           ) : (
             <TimeSeriesChart 
               timeSeriesData={timeSeriesData}
-              metrics={metrics}
+              metrics={allMetrics}
               selectedMetrics={selectedMetrics}
             />
           )}
         </div>
         
         <div className="metrics-area">
-          {loading && metrics.length === 0 ? (
+          {loading && allMetrics.length === 0 ? (
             <div className="loading-indicator">Loading metrics...</div>
           ) : (
             <MetricsList 
-              metrics={metrics}
+              metrics={allMetrics}
               selectedMetrics={selectedMetrics}
               onMetricToggle={handleMetricToggle}
             />
