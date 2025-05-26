@@ -9,6 +9,7 @@ interface FormulaBuilderProps {
 
 const FormulaBuilder: React.FC<FormulaBuilderProps> = ({ metrics, value, onChange }) => {
   const [selectedMetric, setSelectedMetric] = useState<string>('');
+  const [constantValue, setConstantValue] = useState<string>('');
 
   const handleAddMetric = () => {
     if (selectedMetric) {
@@ -16,6 +17,13 @@ const FormulaBuilder: React.FC<FormulaBuilderProps> = ({ metrics, value, onChang
       const metricToken = `{{${selectedMetric}}}`;
       onChange(value ? `${value} ${metricToken}` : metricToken);
       setSelectedMetric('');
+    }
+  };
+
+  const handleAddConstant = () => {
+    if (constantValue.trim()) {
+      onChange(value ? `${value} ${constantValue}` : constantValue);
+      setConstantValue('');
     }
   };
 
@@ -58,6 +66,24 @@ const FormulaBuilder: React.FC<FormulaBuilderProps> = ({ metrics, value, onChang
             Add Metric
           </button>
         </div>
+
+        <div className="constant-input">
+          <input
+            type="text"
+            value={constantValue}
+            onChange={(e) => setConstantValue(e.target.value)}
+            placeholder="Enter a number (e.g., 100.0)"
+            className="form-control"
+          />
+          <button 
+            type="button" 
+            onClick={handleAddConstant}
+            disabled={!constantValue.trim()}
+            className="add-constant-button"
+          >
+            Add Constant
+          </button>
+        </div>
         
         <div className="operator-buttons">
           <button type="button" onClick={() => handleAddOperator('+')} className="operator-button">+</button>
@@ -75,10 +101,11 @@ const FormulaBuilder: React.FC<FormulaBuilderProps> = ({ metrics, value, onChang
       
       <div className="formula-help">
         <h4>Formula Help</h4>
-        <p>Create a formula using metrics and operators:</p>
+        <p>Create a formula using metrics, constants, and operators:</p>
         <ul>
           <li>Select metrics from the dropdown and click "Add Metric"</li>
-          <li>Use operators (+, -, ×, ÷) to combine metrics</li>
+          <li>Enter numeric constants (like 100.0) and click "Add Constant"</li>
+          <li>Use operators (+, -, ×, ÷) to combine metrics and constants</li>
           <li>Use parentheses to control order of operations</li>
         </ul>
         <p>Example: <code>&#123;&#123;fred_us_interest_payments_id&#125;&#125; / &#123;&#123;fred_us_federal_expenditures_id&#125;&#125; * 100</code></p>
