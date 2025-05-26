@@ -77,7 +77,7 @@ export type Emetric_TimeSeries = {
 // to calculate % of interest payment out of overall expenditure
 export type Emetric_Derived_Timeseries_Definition = {
   id: string;
-  description: string;
+  metric: Emetric_Metric;
   alignmentStrategy: 'previous' | 'future' | 'nearest' | 'interpolate';
   formula: string;
 };

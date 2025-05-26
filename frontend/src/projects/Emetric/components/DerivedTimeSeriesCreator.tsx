@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Emetric_Metric, Emetric_Derived_Timeseries_Definition } from '../../../shared/types';
+import { Emetric_Metric, Emetric_Derived_Timeseries_Definition, Emetric_Metadata } from '../../../shared/types';
 import FormulaBuilder from './FormulaBuilder';
 import FirebaseApi from '../../../firebase/FirebaseApi';
 
@@ -9,7 +9,11 @@ interface DerivedTimeSeriesCreatorProps {
 
 const DerivedTimeSeriesCreator: React.FC<DerivedTimeSeriesCreatorProps> = ({ metrics }) => {
   const [name, setName] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [metricName, setMetricName] = useState<string>('');
+  const [metricDescription, setMetricDescription] = useState<string>('');
+  const [updateCycle, setUpdateCycle] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'>('monthly');
+  const [unit, setUnit] = useState<'percent' | 'dollar' | 'billions of dollars'>('percent');
+  const [source, setSource] = useState<string>('');
   const [formula, setFormula] = useState<string>('');
   const [alignmentStrategy, setAlignmentStrategy] = useState<'previous' | 'future' | 'nearest' | 'interpolate'>('previous');
   const [saving, setSaving] = useState<boolean>(false);
@@ -24,8 +28,13 @@ const DerivedTimeSeriesCreator: React.FC<DerivedTimeSeriesCreatorProps> = ({ met
       return;
     }
 
-    if (!description.trim()) {
-      setError('Description is required');
+    if (!metricName.trim()) {
+      setError('Metric name is required');
+      return;
+    }
+
+    if (!metricDescription.trim()) {
+      setError('Metric description is required');
       return;
     }
 
@@ -38,9 +47,25 @@ const DerivedTimeSeriesCreator: React.FC<DerivedTimeSeriesCreatorProps> = ({ met
       setSaving(true);
       setError(null);
       
+      const derivedId = `derived_${name}`; // Generate a unique ID
+      
+      const metadata: Emetric_Metadata = {};
+      if (source.trim()) {
+        metadata.source = source.trim();
+      }
+      
+      const metric: Emetric_Metric = {
+        id: derivedId,
+        name: metricName,
+        description: metricDescription,
+        updateCycle,
+        unit,
+        metadata
+      };
+      
       const derivedTimeSeriesDefinition: Emetric_Derived_Timeseries_Definition = {
-        id: `derived_${name}`, // Generate a unique ID
-        description,
+        id: derivedId,
+        metric,
         alignmentStrategy,
         formula
       };
@@ -51,7 +76,11 @@ const DerivedTimeSeriesCreator: React.FC<DerivedTimeSeriesCreatorProps> = ({ met
       
       // Reset form
       setName('');
-      setDescription('');
+      setMetricName('');
+      setMetricDescription('');
+      setUpdateCycle('monthly');
+      setUnit('percent');
+      setSource('');
       setFormula('');
       setAlignmentStrategy('previous');
       setSuccess(true);
@@ -84,26 +113,80 @@ const DerivedTimeSeriesCreator: React.FC<DerivedTimeSeriesCreatorProps> = ({ met
       
       <form onSubmit={handleSubmit} className="derived-timeseries-form">
         <div className="form-group">
-          <label htmlFor="name">Name:</label>
+          <label htmlFor="name">Id:</label>
           <input
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g., Interest Payments as % of Expenditures"
+            placeholder="e.g., interest_payments_ratio_expenditures"
             className="form-control"
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="description">Description:</label>
+          <label htmlFor="metricName">Metric Name:</label>
+          <input
+            type="text"
+            id="metricName"
+            value={metricName}
+            onChange={(e) => setMetricName(e.target.value)}
+            placeholder="e.g., Interest Payments Ratio"
+            className="form-control"
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="metricDescription">Metric Description:</label>
           <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            id="metricDescription"
+            value={metricDescription}
+            onChange={(e) => setMetricDescription(e.target.value)}
             placeholder="Describe what this derived metric represents"
             className="form-control"
             rows={3}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="updateCycle">Update Cycle:</label>
+          <select
+            id="updateCycle"
+            value={updateCycle}
+            onChange={(e) => setUpdateCycle(e.target.value as any)}
+            className="form-control"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="unit">Unit:</label>
+          <select
+            id="unit"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value as any)}
+            className="form-control"
+          >
+            <option value="percent">Percent</option>
+            <option value="dollar">Dollar</option>
+            <option value="billions of dollars">Billions of Dollars</option>
+          </select>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="source">Source (optional):</label>
+          <input
+            type="text"
+            id="source"
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+            placeholder="e.g., FRED, Treasury, Custom"
+            className="form-control"
           />
         </div>
         
