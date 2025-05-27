@@ -11,6 +11,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import {Emetric_TimeSeries, Emetric_Metric} from '../../../shared/types';
+import { TimeRange } from './TimeRangeSelector';
 
 // Helper function to format date as YYYY-MM-DD
 const formatDateToYYYYMMDD = (timestamp: number): string => {
@@ -69,12 +70,14 @@ interface TimeSeriesChartProps {
   timeSeriesData: Record<string, Emetric_TimeSeries | null>;
   metrics: Emetric_Metric[];
   selectedMetrics: string[];
+  timeRange?: TimeRange;
 }
 
 const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({ 
   timeSeriesData, 
   metrics, 
-  selectedMetrics 
+  selectedMetrics,
+  timeRange
 }) => {
   if (selectedMetrics.length === 0) {
     return (
@@ -104,7 +107,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
     );
   }
 
-  const chartData = prepareChartData(timeSeriesData, selectedMetrics);
+  const chartData = prepareChartData(timeSeriesData, selectedMetrics, timeRange);
 
   // Group metrics by unit
   const metricsByUnit: Record<string, string[]> = {};
@@ -170,7 +173,8 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
 
 const prepareChartData = (
   timeSeriesData: Record<string, Emetric_TimeSeries | null>,
-  selectedMetrics: string[]
+  selectedMetrics: string[],
+  timeRange?: TimeRange
 ) => {
   const allTimestamps = new Set<number>();
   
@@ -178,7 +182,21 @@ const prepareChartData = (
     const timeSeries = timeSeriesData[metricId];
     if (timeSeries) {
       timeSeries.entries.forEach(entry => {
-        allTimestamps.add(entry.timestamp * 1000);
+        // Convert to milliseconds for JavaScript Date
+        const timestamp = entry.timestamp * 1000;
+        
+        // Filter by time range if provided
+        if (timeRange && timeRange.startDate && timeRange.preset !== 'max') {
+          const startTime = timeRange.startDate.getTime();
+          const endTime = timeRange.endDate ? timeRange.endDate.getTime() : Date.now();
+          
+          if (timestamp >= startTime && timestamp <= endTime) {
+            allTimestamps.add(timestamp);
+          }
+        } else {
+          // If no time range or preset is 'max', include all timestamps
+          allTimestamps.add(timestamp);
+        }
       });
     }
   });

@@ -4,13 +4,15 @@ import TimeSeriesChart from './TimeSeriesChart';
 import FirebaseApi from '../../../firebase/FirebaseApi';
 import {Emetric_Metric, Emetric_TimeSeries, Emetric_Derived_Timeseries_Definition} from '../../../shared/types';
 import { metricRegistry } from '../../../shared/emetric/metricRegistry';
+import { TimeRange } from './TimeRangeSelector';
 
 // Define types locally to avoid import issues
 interface GraphProps {
   id: string;
+  timeRange?: TimeRange;
 }
 
-const Graph: React.FC<GraphProps> = ({ id }) => {
+const Graph: React.FC<GraphProps> = ({ id, timeRange }) => {
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<Record<string, Emetric_TimeSeries | null>>({});
   const [loading, setLoading] = useState<boolean>(true);
@@ -104,6 +106,7 @@ const Graph: React.FC<GraphProps> = ({ id }) => {
               timeSeriesData={timeSeriesData}
               metrics={allMetrics}
               selectedMetrics={selectedMetrics}
+              timeRange={timeRange}
             />
           )}
         </div>

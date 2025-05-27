@@ -2,11 +2,21 @@ import React, { useState } from 'react';
 import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
 import MetricExplorer from './components/MetricExplorer';
+import TimeRangeSelector, { TimeRange } from './components/TimeRangeSelector';
 import './Emetric.css';
 
 const EmetricProject: React.FC = () => {
   const [graphs, setGraphs] = useState<string[]>(['graph-1']);
   const [activeView, setActiveView] = useState<string>('dashboard');
+  const [timeRange, setTimeRange] = useState<TimeRange>({
+    startDate: null,
+    endDate: new Date(),
+    preset: 'max'
+  });
+
+  const handleTimeRangeChange = (newRange: TimeRange) => {
+    setTimeRange(newRange);
+  };
 
   const handleAddGraph = () => {
     const newGraphId = `graph-${graphs.length + 1}`;
@@ -29,6 +39,11 @@ const EmetricProject: React.FC = () => {
       default:
         return (
           <>
+            <TimeRangeSelector 
+              selectedRange={timeRange}
+              onRangeChange={handleTimeRangeChange}
+            />
+            
             <div className="emetric-actions">
               <button className="add-graph-button" onClick={handleAddGraph}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -52,7 +67,7 @@ const EmetricProject: React.FC = () => {
                       Remove
                     </button>
                   </div>
-                  <Graph id={graphId} />
+                  <Graph id={graphId} timeRange={timeRange} />
                 </div>
               ))}
             </div>
