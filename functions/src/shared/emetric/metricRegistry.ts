@@ -11,6 +11,16 @@ export const getMetricById = (id: string): Emetric_Metric | null => {
 // Make sure to update metricBuilderRegistry as well
 export const metricRegistry: Array<Emetric_Metric> = [
   {
+    id: "treasury_us_marketable_debt_maturity_percentile",
+    name: "US Marketable Debt Maturity Percentile",
+    description: "Percentage of total marketable debt that will mature by a given date",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
     id: "treasury_us_marketable_debt_expiration_graph",
     name: "US Marketable Debt Expiration Graph",
     description: "Aggregated outstanding marketable debt amounts per maturity dates from Treasury MSPD data",
