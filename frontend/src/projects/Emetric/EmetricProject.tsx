@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useFirebase } from '../../firebase/FirebaseContext';
+import LoginPrompt from '../../components/LoginPrompt';
 import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
 import MetricExplorer from './components/MetricExplorer';
@@ -6,6 +8,7 @@ import TimeRangeSelector, { TimeRange } from './components/TimeRangeSelector';
 import './Emetric.css';
 
 const EmetricProject: React.FC = () => {
+  const { user } = useFirebase();
   const [graphs, setGraphs] = useState<string[]>(['graph-1']);
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [timeRange, setTimeRange] = useState<TimeRange>({
@@ -13,6 +16,22 @@ const EmetricProject: React.FC = () => {
     endDate: new Date(),
     preset: 'max'
   });
+
+  // If user is not authenticated, show login prompt
+  if (!user) {
+    return (
+      <div className="emetric-project-container">
+        <div className="emetric-header">
+          <h1>Emetric Project</h1>
+        </div>
+        <LoginPrompt 
+          title="Emetric Dashboard Access" 
+          message="Please log in to access the Emetric dashboard and view economic metrics."
+          className="emetric-login-prompt"
+        />
+      </div>
+    );
+  }
 
   const handleTimeRangeChange = (newRange: TimeRange) => {
     setTimeRange(newRange);
