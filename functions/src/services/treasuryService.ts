@@ -34,6 +34,42 @@ export class TreasuryService {
   }
 
   /**
+   * Fetches US Total Marketable Debt data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchTotalMarketableDebtData(startDate?: string): Promise<TreasuryMetricData[]> {
+    const endpoint = "/v1/debt/mspd/mspd_table_1";
+    const filter = startDate 
+      ? `security_type_desc:eq:Total%20Marketable,record_date:gte:${startDate}`
+      : "security_type_desc:eq:Total%20Marketable";
+    const pageSize = 1000;
+    
+    const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Treasury API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json() as { 
+      data: Array<{
+        record_date: string;
+        total_mil_amt: string;
+        [key: string]: string;
+      }> 
+    };
+    
+    return data.data
+      .filter(item => item.total_mil_amt !== null)
+      .map(item => ({
+        timestamp: new Date(item.record_date).getTime(),
+        value: parseFloat(item.total_mil_amt) / 1000, // Convert from millions to billions
+      }));
+  }
+
+  /**
    * Fetches Treasury Bond Average Interest Rate data
    * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
