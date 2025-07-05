@@ -12,12 +12,14 @@ import { asyncPopulateTotalMarketableDebtData } from "./populateTotalMarketableD
 import { asyncPopulateTotalNonmarketableDebtData } from "./populateTotalNonmarketableDebtData.js";
 import { asyncPopulateMarketableDebtBillsData } from "./populateMarketableDebtBillsData.js";
 import { asyncPopulateMarketableDebtNotesData } from "./populateMarketableDebtNotesData.js";
+import { asyncPopulateMarketableDebtBondsData } from "./populateMarketableDebtBondsData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
   'treasury_us_total_marketable_debt': asyncPopulateTotalMarketableDebtData,
   'treasury_us_total_nonmarketable_debt': asyncPopulateTotalNonmarketableDebtData,
   'treasury_us_marketable_debt_bills': asyncPopulateMarketableDebtBillsData,
   'treasury_us_marketable_debt_notes': asyncPopulateMarketableDebtNotesData,
+  'treasury_us_marketable_debt_bonds': asyncPopulateMarketableDebtBondsData,
   'fred_us_gdp_data_id': asyncPopulateGDPData,
   'fred_us_debt_gdp_ratio_id': asyncPopulateDebtGDPData,
   'treasury_treasury_bond_avg_interest_rates': asyncPopulateTreasuryBondAverageInterestRateData,
