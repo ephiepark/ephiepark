@@ -134,7 +134,11 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
           <XAxis 
             dataKey="timestamp" 
+            type="number"
+            scale="time"
+            domain={['auto', 'auto']}
             tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
+            allowDataOverflow={true}
           />
           {uniqueUnits.map((unit, index) => (
             <YAxis 
