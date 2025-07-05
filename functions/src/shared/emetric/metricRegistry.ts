@@ -51,6 +51,36 @@ export const metricRegistry: Array<Emetric_Metric> = [
     }
   },
   {
+    id: "treasury_us_marketable_debt_tips",
+    name: "US Marketable Debt - TIPS",
+    description: "Outstanding marketable debt of the United States Treasury in the Treasury Inflation-Protected Securities class",
+    updateCycle: "daily",
+    unit: "billions of dollars",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
+    id: "treasury_us_marketable_debt_frn",
+    name: "US Marketable Debt - Floating Rate Notes",
+    description: "Outstanding marketable debt of the United States Treasury in the Floating Rate Notes security class",
+    updateCycle: "daily",
+    unit: "billions of dollars",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
+    id: "treasury_us_marketable_debt_ffb",
+    name: "US Marketable Debt - Federal Financing Bank",
+    description: "Outstanding marketable debt of the United States Treasury in the Federal Financing Bank security class",
+    updateCycle: "daily",
+    unit: "billions of dollars",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
     id: "treasury_us_total_nonmarketable_debt",
     name: "US Total Nonmarketable Debt",
     description: "Total outstanding nonmarketable debt of the United States Treasury",

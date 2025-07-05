@@ -13,6 +13,9 @@ import { asyncPopulateTotalNonmarketableDebtData } from "./populateTotalNonmarke
 import { asyncPopulateMarketableDebtBillsData } from "./populateMarketableDebtBillsData.js";
 import { asyncPopulateMarketableDebtNotesData } from "./populateMarketableDebtNotesData.js";
 import { asyncPopulateMarketableDebtBondsData } from "./populateMarketableDebtBondsData.js";
+import { asyncPopulateMarketableDebtTIPSData } from "./populateMarketableDebtTIPSData.js";
+import { asyncPopulateMarketableDebtFRNData } from "./populateMarketableDebtFRNData.js";
+import { asyncPopulateMarketableDebtFFBData } from "./populateMarketableDebtFFBData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
   'treasury_us_total_marketable_debt': asyncPopulateTotalMarketableDebtData,
@@ -20,6 +23,9 @@ export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetr
   'treasury_us_marketable_debt_bills': asyncPopulateMarketableDebtBillsData,
   'treasury_us_marketable_debt_notes': asyncPopulateMarketableDebtNotesData,
   'treasury_us_marketable_debt_bonds': asyncPopulateMarketableDebtBondsData,
+  'treasury_us_marketable_debt_tips': asyncPopulateMarketableDebtTIPSData,
+  'treasury_us_marketable_debt_frn': asyncPopulateMarketableDebtFRNData,
+  'treasury_us_marketable_debt_ffb': asyncPopulateMarketableDebtFFBData,
   'fred_us_gdp_data_id': asyncPopulateGDPData,
   'fred_us_debt_gdp_ratio_id': asyncPopulateDebtGDPData,
   'treasury_treasury_bond_avg_interest_rates': asyncPopulateTreasuryBondAverageInterestRateData,
