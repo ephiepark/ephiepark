@@ -21,6 +21,16 @@ export const metricRegistry: Array<Emetric_Metric> = [
     }
   },
   {
+    id: "treasury_us_marketable_debt_bills",
+    name: "US Marketable Debt - Bills",
+    description: "Outstanding marketable debt of the United States Treasury in the Bills security class",
+    updateCycle: "daily",
+    unit: "billions of dollars",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
     id: "treasury_us_total_nonmarketable_debt",
     name: "US Total Nonmarketable Debt",
     description: "Total outstanding nonmarketable debt of the United States Treasury",

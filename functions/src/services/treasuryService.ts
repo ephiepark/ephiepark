@@ -176,6 +176,42 @@ export class TreasuryService {
   }
 
   /**
+   * Fetches US Marketable Debt - Bills data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchMarketableDebtBillsData(startDate?: string): Promise<TreasuryMetricData[]> {
+    const endpoint = "/v1/debt/mspd/mspd_table_1";
+    const filter = startDate 
+      ? `security_class_desc:eq:Bills,security_type_desc:eq:Marketable,record_date:gte:${startDate}`
+      : "security_class_desc:eq:Bills,security_type_desc:eq:Marketable";
+    const pageSize = 1000;
+    
+    const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Treasury API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json() as { 
+      data: Array<{
+        record_date: string;
+        total_mil_amt: string;
+        [key: string]: string;
+      }> 
+    };
+    
+    return data.data
+      .filter(item => item.total_mil_amt !== null)
+      .map(item => ({
+        timestamp: new Date(item.record_date).getTime(),
+        value: parseFloat(item.total_mil_amt) / 1000, // Convert from millions to billions
+      }));
+  }
+
+  /**
    * Aggregates debt data by maturity date
    * @param data - Raw data from Treasury API
    * @return Aggregated data by maturity date
