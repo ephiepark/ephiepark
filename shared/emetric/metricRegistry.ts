@@ -21,6 +21,16 @@ export const metricRegistry: Array<Emetric_Metric> = [
     }
   },
   {
+    id: "treasury_us_total_nonmarketable_debt",
+    name: "US Total Nonmarketable Debt",
+    description: "Total outstanding nonmarketable debt of the United States Treasury",
+    updateCycle: "daily",
+    unit: "billions of dollars",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
     id: "treasury_us_marketable_debt_maturity_percentile",
     name: "US Marketable Debt Maturity Percentile",
     description: "Percentage of total marketable debt that will mature by a given date",
