@@ -170,4 +170,14 @@ export const metricRegistry: Array<Emetric_Metric> = [
       source: "FRED"
     }
   },
+  {
+    id: "treasury_us_marketable_debt_days_to_p25_maturity",
+    name: "Days to P25 Maturity of Marketable Debt",
+    description: "Number of days until 25% of outstanding marketable debt matures from the record date",
+    updateCycle: "daily",
+    unit: "number of days",
+    metadata: {
+      source: "Treasury"
+    }
+  },
 ];

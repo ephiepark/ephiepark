@@ -58,7 +58,7 @@ export type Emetric_Metric = {
   name: string;
   description: string;
   updateCycle: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
-  unit: 'percent' | 'dollar' | 'billions of dollars';
+  unit: 'percent' | 'dollar' | 'billions of dollars' | 'number of days';
   metadata: Emetric_Metadata; // Optional additional data (e.g. revision, confidence interval)
 };
 

@@ -176,6 +176,38 @@ export class TreasuryService {
   }
 
   /**
+   * Fetches available record dates for marketable debt data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return Array of record dates in YYYY-MM-DD format
+   */
+  async fetchMarketableDebtRecordDates(startDate?: string): Promise<string[]> {
+    const endpoint = "/v1/debt/mspd/mspd_table_3_market";
+    const filter = startDate 
+      ? `security_class1_desc:eq:Total%20Marketable,record_date:gte:${startDate}`
+      : 'security_class1_desc:eq:Total%20Marketable';
+    const pageSize = 10000;
+    
+    const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Treasury API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json() as { 
+      data: Array<{
+        record_date: string;
+        [key: string]: string;
+      }> 
+    };
+    
+    // Extract unique record dates and sort them in ascending order
+    const recordDates = [...new Set(data.data.map(item => item.record_date))];
+    return recordDates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  }
+
+  /**
    * Fetches US Marketable Debt - Bills data
    * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
