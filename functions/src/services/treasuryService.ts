@@ -17,9 +17,48 @@ export interface DebtExpirationData {
 }
 
 /**
+ * Interfaces for raw API responses
+ */
+interface TreasuryRawResponse<T> {
+  data: T[];
+  meta: {
+    count: number;
+    [key: string]: any;
+  };
+  links?: {
+    self: string;
+    first?: string;
+    prev?: string;
+    next?: string;
+    last?: string;
+  };
+}
+
+interface TreasuryDebtTableItem {
+  record_date: string;
+  total_mil_amt: string;
+  [key: string]: string;
+}
+
+interface TreasuryDebtExpirationItem {
+  maturity_date: string;
+  outstanding_amt: string;
+  [key: string]: string;
+}
+
+interface TreasuryInterestRateItem {
+  record_date: string;
+  avg_interest_rate_amt: string;
+  [key: string]: string;
+}
+
+/**
  * Service for interacting with the Treasury API
  */
 export class TreasuryService {
+  // Static cache at the class level
+  private static cache: Map<string, any> = new Map();
+
   private config: {
     baseUrl: string;
   };
@@ -31,6 +70,27 @@ export class TreasuryService {
     this.config = {
       baseUrl: "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2",
     };
+  }
+
+  // Helper method to get or fetch raw data with generic type
+  private async getOrFetchData<T>(url: string): Promise<T> {
+    // Check cache first
+    if (TreasuryService.cache.has(url)) {
+      return TreasuryService.cache.get(url) as T;
+    }
+    
+    // If not in cache, fetch it
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Treasury API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json() as T;
+    
+    // Store raw data in cache
+    TreasuryService.cache.set(url, data);
+    
+    return data;
   }
 
   /**
@@ -47,21 +107,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -83,21 +132,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -119,21 +157,10 @@ export class TreasuryService {
     
     const url = `${this.config.baseUrl}${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryInterestRateItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        avg_interest_rate_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.avg_interest_rate_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -152,22 +179,11 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        maturity_date: string;
-        outstanding_amt: string;
-        [key: string]: string;
-      }> 
-    };
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtExpirationItem>>(url);
     
     // Process and aggregate the data by maturity date
-    const aggregatedData = this.aggregateByMaturityDate(data.data);
+    const aggregatedData = this.aggregateByMaturityDate(rawData.data);
     
     return aggregatedData.map(item => ({
       timestamp: new Date(item.maturity_date).getTime(),
@@ -189,21 +205,11 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        [key: string]: string;
-      }> 
-    };
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<{record_date: string; [key: string]: string;}>>(url);
     
     // Extract unique record dates and sort them in ascending order
-    const recordDates = [...new Set(data.data.map(item => item.record_date))];
+    const recordDates = [...new Set(rawData.data.map(item => item.record_date))];
     return recordDates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }
 
@@ -221,21 +227,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -257,21 +252,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -293,21 +277,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -329,21 +302,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -365,21 +327,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
@@ -401,21 +352,10 @@ export class TreasuryService {
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
     
-    const response = await fetch(url);
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtTableItem>>(url);
     
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
-    }
-    
-    const data = await response.json() as { 
-      data: Array<{
-        record_date: string;
-        total_mil_amt: string;
-        [key: string]: string;
-      }> 
-    };
-    
-    return data.data
+    return rawData.data
       .filter(item => item.total_mil_amt !== null)
       .map(item => ({
         timestamp: new Date(item.record_date).getTime(),
