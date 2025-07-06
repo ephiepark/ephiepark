@@ -17,6 +17,9 @@ import { asyncPopulateMarketableDebtTIPSData } from "./populateMarketableDebtTIP
 import { asyncPopulateMarketableDebtFRNData } from "./populateMarketableDebtFRNData.js";
 import { asyncPopulateMarketableDebtFFBData } from "./populateMarketableDebtFFBData.js";
 import { asyncPopulateMarketableDebtDaysToP25MaturityData } from "./populateMarketableDebtDaysToP25MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP50MaturityData } from "./populateMarketableDebtDaysToP50MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP75MaturityData } from "./populateMarketableDebtDaysToP75MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP90MaturityData } from "./populateMarketableDebtDaysToP90MaturityData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
   'treasury_us_total_marketable_debt': asyncPopulateTotalMarketableDebtData,
@@ -35,5 +38,8 @@ export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetr
   'fred_us_interest_payments_id': asyncPopulateInterestPaymentsData,
   'treasury_us_marketable_debt_expiration_graph': asyncPopulateMarketableDebtExpirationData,
   'treasury_us_marketable_debt_maturity_percentile': asyncPopulateMarketableDebtMaturityPercentileData,
-  'treasury_us_marketable_debt_days_to_p25_maturity': asyncPopulateMarketableDebtDaysToP25MaturityData
+  'treasury_us_marketable_debt_days_to_p25_maturity': asyncPopulateMarketableDebtDaysToP25MaturityData,
+  'treasury_us_marketable_debt_days_to_p50_maturity': asyncPopulateMarketableDebtDaysToP50MaturityData,
+  'treasury_us_marketable_debt_days_to_p75_maturity': asyncPopulateMarketableDebtDaysToP75MaturityData,
+  'treasury_us_marketable_debt_days_to_p90_maturity': asyncPopulateMarketableDebtDaysToP90MaturityData
 };

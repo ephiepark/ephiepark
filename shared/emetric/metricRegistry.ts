@@ -180,4 +180,34 @@ export const metricRegistry: Array<Emetric_Metric> = [
       source: "Treasury"
     }
   },
+  {
+    id: "treasury_us_marketable_debt_days_to_p50_maturity",
+    name: "Days to P50 Maturity of Marketable Debt",
+    description: "Number of days until 50% of outstanding marketable debt matures from the record date",
+    updateCycle: "daily",
+    unit: "number of days",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
+    id: "treasury_us_marketable_debt_days_to_p75_maturity",
+    name: "Days to P75 Maturity of Marketable Debt",
+    description: "Number of days until 75% of outstanding marketable debt matures from the record date",
+    updateCycle: "daily",
+    unit: "number of days",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
+    id: "treasury_us_marketable_debt_days_to_p90_maturity",
+    name: "Days to P90 Maturity of Marketable Debt",
+    description: "Number of days until 90% of outstanding marketable debt matures from the record date",
+    updateCycle: "daily",
+    unit: "number of days",
+    metadata: {
+      source: "Treasury"
+    }
+  },
 ];
