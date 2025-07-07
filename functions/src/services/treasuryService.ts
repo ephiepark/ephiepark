@@ -72,6 +72,11 @@ export class TreasuryService {
     };
   }
 
+  // Utility method to sleep/delay execution
+  private async sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   // Helper method to get or fetch raw data with generic type
   private async getOrFetchData<T>(url: string): Promise<T> {
     // Check cache first
@@ -79,18 +84,41 @@ export class TreasuryService {
       return TreasuryService.cache.get(url) as T;
     }
     
-    // If not in cache, fetch it
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.statusText}`);
+    // Add retry logic
+    let attempts = 0;
+    const maxAttempts = 4;
+    
+    while (attempts < maxAttempts) {
+      try {
+        // If not in cache, fetch it
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Treasury API error: ${response.statusText}`);
+        }
+        
+        const data = await response.json() as T;
+        
+        // Store raw data in cache
+        TreasuryService.cache.set(url, data);
+        
+        return data;
+      } catch (error) {
+        attempts++;
+        
+        // If we've reached max attempts, throw the error
+        if (attempts >= maxAttempts) {
+          throw error;
+        }
+        
+        // Otherwise, sleep with exponential backoff before retrying
+        const sleepTime = 1000 * Math.pow(2, attempts + 2); // 1s, 2s, 4s
+        console.log(`Treasury API request failed, retrying (${attempts}/${maxAttempts}) after ${sleepTime}ms...`);
+        await this.sleep(sleepTime);
+      }
     }
     
-    const data = await response.json() as T;
-    
-    // Store raw data in cache
-    TreasuryService.cache.set(url, data);
-    
-    return data;
+    // This should never be reached due to the throw in the catch block
+    throw new Error("Failed to fetch data after maximum retry attempts");
   }
 
   /**
