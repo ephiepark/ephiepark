@@ -46,6 +46,13 @@ interface TreasuryDebtExpirationItem {
   [key: string]: string;
 }
 
+export interface TreasuryDebtYieldItem {
+  maturity_date: string;
+  yield_pct: string;
+  issued_amt: string;
+  [key: string]: string;
+}
+
 interface TreasuryInterestRateItem {
   record_date: string;
   avg_interest_rate_amt: string;
@@ -389,6 +396,28 @@ export class TreasuryService {
         timestamp: new Date(item.record_date).getTime(),
         value: parseFloat(item.total_mil_amt) / 1000, // Convert from millions to billions
       }));
+  }
+
+  /**
+   * Fetches marketable debt data with yield information
+   * @param date - The record date in YYYY-MM-DD format
+   * @return The raw debt data including yield information
+   */
+  async fetchMarketableDebtWithYieldData(date: string): Promise<TreasuryDebtYieldItem[]> {
+    const endpoint = "/v1/debt/mspd/mspd_table_3_market";
+    const filter = `record_date:eq:${date}`;
+    const pageSize = 10000;
+    
+    const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
+    
+    // Use the helper method with type parameter
+    const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtYieldItem>>(url);
+    
+    if (!rawData.data || rawData.data.length === 0) {
+      return [];
+    }
+    
+    return rawData.data;
   }
 
   /**

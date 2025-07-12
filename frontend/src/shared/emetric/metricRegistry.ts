@@ -11,6 +11,16 @@ export const getMetricById = (id: string): Emetric_Metric | null => {
 // Make sure to update metricBuilderRegistry as well
 export const metricRegistry: Array<Emetric_Metric> = [
   {
+    id: "treasury_us_marketable_debt_avg_yield",
+    name: "US Marketable Debt Average Yield",
+    description: "Weighted average yield of outstanding marketable debt, weighted by issued amount",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "Treasury"
+    }
+  },
+  {
     id: "treasury_us_total_marketable_debt",
     name: "US Total Marketable Debt",
     description: "Total outstanding marketable debt of the United States Treasury",
