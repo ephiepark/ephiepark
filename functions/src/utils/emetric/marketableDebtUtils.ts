@@ -1,5 +1,5 @@
 import { logger } from "firebase-functions";
-import { TreasuryService } from "../../services/treasuryService.js";
+import { TreasuryMetricData } from "../../services/treasuryService.js";
 
 /**
  * Calculates the number of days between two dates
@@ -28,7 +28,7 @@ export function daysBetween(date1: Date, date2: Date): number {
  */
 export async function calculateDaysToPercentileMaturity(
   recordDate: string, 
-  debtData: TreasuryService['fetchMarketableDebtExpirationData'] extends (...args: any[]) => Promise<infer R> ? R : never,
+  debtData: TreasuryMetricData[],
   percentileThreshold: number
 ): Promise<number | null> {
   if (debtData.length === 0) {

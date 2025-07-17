@@ -53,14 +53,29 @@ export const populateMarketableDebtDaysToPercentileMaturityData = async (
       
       logger.info(`Found ${recordDates.length} new record dates to process`);
       
-      // Process each record date
+      // Fetch debt expiration data for all record dates since startDate in a single API call
+      logger.info(`Fetching debt expiration data from Treasury API since ${startDate}`);
+      const allDebtData = await treasuryService.fetchMarketableDebtExpirationData(startDate);
+      
+      if (!allDebtData || Object.keys(allDebtData).length === 0) {
+        logger.warn("No debt expiration data returned from Treasury API");
+        return;
+      }
+      
+      // Process each record date's data
       const newEntries: Emetric_TimeSeriesEntry[] = [];
       
       for (const recordDate of recordDates) {
+        // Skip if this record date is not in the returned data
+        if (!allDebtData[recordDate]) {
+          logger.info(`No debt data available for record date: ${recordDate}`);
+          continue;
+        }
+        
         logger.info(`Processing record date: ${recordDate}`);
         
-        // Fetch debt expiration data for this record date
-        const debtData = await treasuryService.fetchMarketableDebtExpirationData(recordDate);
+        // Get debt data for this record date
+        const debtData = allDebtData[recordDate];
         
         // Calculate days to percentile maturity
         const daysToPercentileMaturity = await calculateDaysToPercentileMaturity(
@@ -111,14 +126,29 @@ export const populateMarketableDebtDaysToPercentileMaturityData = async (
       
       logger.info(`Found ${recordDates.length} record dates to process`);
       
-      // Process each record date
+      // Fetch all debt expiration data in a single API call
+      logger.info("Fetching all debt expiration data from Treasury API");
+      const allDebtData = await treasuryService.fetchMarketableDebtExpirationData("1900-01-01"); // Use a very old date to get all data
+      
+      if (!allDebtData || typeof allDebtData === 'object' && Object.keys(allDebtData).length === 0) {
+        logger.warn("No debt expiration data returned from Treasury API");
+        return;
+      }
+      
+      // Process each record date's data
       const timeSeriesEntries: Emetric_TimeSeriesEntry[] = [];
       
       for (const recordDate of recordDates) {
+        // Skip if this record date is not in the returned data
+        if (!allDebtData[recordDate]) {
+          logger.info(`No debt data available for record date: ${recordDate}`);
+          continue;
+        }
+        
         logger.info(`Processing record date: ${recordDate}`);
         
-        // Fetch debt expiration data for this record date
-        const debtData = await treasuryService.fetchMarketableDebtExpirationData(recordDate);
+        // Get debt data for this record date
+        const debtData = allDebtData[recordDate];
         
         // Calculate days to percentile maturity
         const daysToPercentileMaturity = await calculateDaysToPercentileMaturity(

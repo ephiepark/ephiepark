@@ -36,10 +36,13 @@ export const asyncPopulateMarketableDebtExpirationData = async (db: Firestore, m
     
     // Fetch debt expiration data
     logger.info(`Fetching Debt Expiration data from Treasury API for date: ${recordDate}`);
-    const debtData = await treasuryService.fetchMarketableDebtExpirationData(recordDate);
+    const allDebtData = await treasuryService.fetchMarketableDebtExpirationData(recordDate);
     
-    if (debtData.length === 0) {
-      logger.warn("No Debt Expiration data returned from Treasury API");
+    // Get data for the specific record date
+    const debtData = allDebtData[recordDate];
+    
+    if (!debtData || debtData.length === 0) {
+      logger.warn(`No Debt Expiration data returned from Treasury API for date: ${recordDate}`);
       return;
     }
     

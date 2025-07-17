@@ -204,12 +204,14 @@ export class TreasuryService {
   }
   /**
    * Fetches US Debt Expiration data from Treasury MSPD
-   * @param date - The record date in YYYY-MM-DD format
-   * @return The fetched and aggregated debt expiration data
+   * @param startDate - The start date (YYYY-MM-DD format) for fetching data since that date
+   * @return The fetched and aggregated debt expiration data, grouped by record date
    */
-  async fetchMarketableDebtExpirationData(date: string): Promise<TreasuryMetricData[]> {
+  async fetchMarketableDebtExpirationData(
+    startDate: string
+  ): Promise<Record<string, TreasuryMetricData[]>> {
     const endpoint = "/v1/debt/mspd/mspd_table_3_market";
-    const filter = `record_date:eq:${date}`;
+    const filter = `record_date:gte:${startDate}`;
     const pageSize = 10000;
     
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
@@ -217,13 +219,31 @@ export class TreasuryService {
     // Use the helper method with type parameter
     const rawData = await this.getOrFetchData<TreasuryRawResponse<TreasuryDebtExpirationItem>>(url);
     
-    // Process and aggregate the data by maturity date
-    const aggregatedData = this.aggregateByMaturityDate(rawData.data);
+    // Group data by record date
+    const groupedByRecordDate: Record<string, TreasuryDebtExpirationItem[]> = {};
     
-    return aggregatedData.map(item => ({
-      timestamp: new Date(item.maturity_date).getTime(),
-      value: item.outstanding_amt
-    }));
+    for (const item of rawData.data) {
+      const recordDate = item.record_date;
+      if (!groupedByRecordDate[recordDate]) {
+        groupedByRecordDate[recordDate] = [];
+      }
+      groupedByRecordDate[recordDate].push(item);
+    }
+    
+    // Process each group separately
+    const result: Record<string, TreasuryMetricData[]> = {};
+    
+    for (const [recordDate, items] of Object.entries(groupedByRecordDate)) {
+      // Process and aggregate the data by maturity date for this record date
+      const aggregatedData = this.aggregateByMaturityDate(items);
+      
+      result[recordDate] = aggregatedData.map(item => ({
+        timestamp: new Date(item.maturity_date).getTime(),
+        value: item.outstanding_amt
+      }));
+    }
+    
+    return result;
   }
 
   /**

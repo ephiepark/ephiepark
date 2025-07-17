@@ -16,10 +16,10 @@ import { asyncPopulateMarketableDebtBondsData } from "./populateMarketableDebtBo
 import { asyncPopulateMarketableDebtTIPSData } from "./populateMarketableDebtTIPSData.js";
 import { asyncPopulateMarketableDebtFRNData } from "./populateMarketableDebtFRNData.js";
 import { asyncPopulateMarketableDebtFFBData } from "./populateMarketableDebtFFBData.js";
-// import { asyncPopulateMarketableDebtDaysToP25MaturityData } from "./populateMarketableDebtDaysToP25MaturityData.js";
-// import { asyncPopulateMarketableDebtDaysToP50MaturityData } from "./populateMarketableDebtDaysToP50MaturityData.js";
-// import { asyncPopulateMarketableDebtDaysToP75MaturityData } from "./populateMarketableDebtDaysToP75MaturityData.js";
-// import { asyncPopulateMarketableDebtDaysToP90MaturityData } from "./populateMarketableDebtDaysToP90MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP25MaturityData } from "./populateMarketableDebtDaysToP25MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP50MaturityData } from "./populateMarketableDebtDaysToP50MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP75MaturityData } from "./populateMarketableDebtDaysToP75MaturityData.js";
+import { asyncPopulateMarketableDebtDaysToP90MaturityData } from "./populateMarketableDebtDaysToP90MaturityData.js";
 import { asyncPopulateMarketableDebtAvgYieldData } from "./populateMarketableDebtAvgYieldData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
@@ -40,8 +40,8 @@ export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetr
   'fred_us_interest_payments_id': asyncPopulateInterestPaymentsData,
   'treasury_us_marketable_debt_expiration_graph': asyncPopulateMarketableDebtExpirationData,
   'treasury_us_marketable_debt_maturity_percentile': asyncPopulateMarketableDebtMaturityPercentileData,
-  // 'treasury_us_marketable_debt_days_to_p25_maturity': asyncPopulateMarketableDebtDaysToP25MaturityData,
-  // 'treasury_us_marketable_debt_days_to_p50_maturity': asyncPopulateMarketableDebtDaysToP50MaturityData,
-  // 'treasury_us_marketable_debt_days_to_p75_maturity': asyncPopulateMarketableDebtDaysToP75MaturityData,
-  // 'treasury_us_marketable_debt_days_to_p90_maturity': asyncPopulateMarketableDebtDaysToP90MaturityData
+  'treasury_us_marketable_debt_days_to_p25_maturity': asyncPopulateMarketableDebtDaysToP25MaturityData,
+  'treasury_us_marketable_debt_days_to_p50_maturity': asyncPopulateMarketableDebtDaysToP50MaturityData,
+  'treasury_us_marketable_debt_days_to_p75_maturity': asyncPopulateMarketableDebtDaysToP75MaturityData,
+  'treasury_us_marketable_debt_days_to_p90_maturity': asyncPopulateMarketableDebtDaysToP90MaturityData
 };
