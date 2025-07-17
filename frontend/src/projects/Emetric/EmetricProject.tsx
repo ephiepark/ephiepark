@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useFirebase } from '../../firebase/FirebaseContext';
 import LoginPrompt from '../../components/LoginPrompt';
 import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
 import MetricExplorer from './components/MetricExplorer';
+import SavedViewsManager from './components/SavedViewsManager';
 import TimeRangeSelector, { TimeRange } from './components/TimeRangeSelector';
+import { Emetric_SavedView } from '../../shared/types';
 import './Emetric.css';
+import './components/SavedViewsManager.css';
 
 const EmetricProject: React.FC = () => {
   const { user } = useFirebase();
@@ -15,6 +18,12 @@ const EmetricProject: React.FC = () => {
     startDate: null,
     endDate: new Date(),
     preset: 'max'
+  });
+  const [showSavedViews, setShowSavedViews] = useState<boolean>(false);
+  
+  // Store selected metrics for each graph
+  const selectedMetricsRef = useRef<Record<string, string[]>>({
+    'graph-1': []
   });
 
   // If user is not authenticated, show login prompt
@@ -40,14 +49,52 @@ const EmetricProject: React.FC = () => {
   const handleAddGraph = () => {
     const newGraphId = `graph-${graphs.length + 1}`;
     setGraphs([...graphs, newGraphId]);
+    // Initialize empty selected metrics for the new graph
+    selectedMetricsRef.current[newGraphId] = [];
   };
 
   const handleRemoveGraph = (graphIdToRemove: string) => {
     setGraphs(graphs.filter(graphId => graphId !== graphIdToRemove));
+    // Clean up selected metrics for the removed graph
+    const updatedMetrics = { ...selectedMetricsRef.current };
+    delete updatedMetrics[graphIdToRemove];
+    selectedMetricsRef.current = updatedMetrics;
   };
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
+  };
+
+  const handleMetricsChange = (graphId: string, metrics: string[]) => {
+    // Update the selected metrics for the graph
+    selectedMetricsRef.current[graphId] = metrics;
+  };
+
+  const getSelectedMetricsForGraph = (graphId: string): string[] => {
+    return selectedMetricsRef.current[graphId] || [];
+  };
+
+  const handleLoadSavedView = (view: Emetric_SavedView) => {
+    // Update time range
+    setTimeRange(view.timeRange);
+    
+    // Update graphs and their selected metrics
+    const newGraphs = view.graphs.map(graph => graph.id);
+    setGraphs(newGraphs);
+    
+    // Update selected metrics for each graph
+    const newSelectedMetrics: Record<string, string[]> = {};
+    view.graphs.forEach(graph => {
+      newSelectedMetrics[graph.id] = graph.selectedMetrics;
+    });
+    selectedMetricsRef.current = newSelectedMetrics;
+    
+    // Hide saved views panel after loading
+    setShowSavedViews(false);
+  };
+
+  const toggleSavedViews = () => {
+    setShowSavedViews(!showSavedViews);
   };
 
   const renderContent = () => {
@@ -63,12 +110,28 @@ const EmetricProject: React.FC = () => {
               onRangeChange={handleTimeRangeChange}
             />
             
+            {showSavedViews && (
+              <SavedViewsManager
+                graphs={graphs}
+                getSelectedMetricsForGraph={getSelectedMetricsForGraph}
+                timeRange={timeRange}
+                onLoadView={handleLoadSavedView}
+              />
+            )}
+            
             <div className="emetric-actions">
               <button className="add-graph-button" onClick={handleAddGraph}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 Add Graph
+              </button>
+              
+              <button className="saved-views-button" onClick={toggleSavedViews}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+                {showSavedViews ? 'Hide Saved Views' : 'Show Saved Views'}
               </button>
             </div>
             
@@ -86,7 +149,12 @@ const EmetricProject: React.FC = () => {
                       Remove
                     </button>
                   </div>
-                  <Graph id={graphId} timeRange={timeRange} />
+                  <Graph 
+                    id={graphId} 
+                    timeRange={timeRange} 
+                    initialSelectedMetrics={getSelectedMetricsForGraph(graphId)}
+                    onMetricsChange={handleMetricsChange}
+                  />
                 </div>
               ))}
             </div>

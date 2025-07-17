@@ -162,9 +162,10 @@
   justify-content: flex-end;
   margin-bottom: 2rem;
   margin-top: 1rem;
+  gap: 1rem;
 }
 
-.add-graph-button {
+.add-graph-button, .saved-views-button {
   background-color: #1a73e8;
   color: white;
   border: none;
@@ -177,13 +178,21 @@
   transition: background-color 0.2s;
 }
 
-.add-graph-button:hover {
+.add-graph-button:hover, .saved-views-button:hover {
   background-color: #1557b0;
 }
 
-.add-graph-button svg {
+.add-graph-button svg, .saved-views-button svg {
   width: 16px;
   height: 16px;
+}
+
+.saved-views-button {
+  background-color: #4a90e2;
+}
+
+.saved-views-button:hover {
+  background-color: #357ab8;
 }
 
 /* Graph Container Styles */

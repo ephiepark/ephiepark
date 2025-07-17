@@ -48,6 +48,7 @@ export interface UserData {
 
 // Emetric Types
 export const EMETRIC_TIMESERIES_COLLECTION = "emetric_timeseries";
+export const EMETRIC_SAVED_VIEWS_COLLECTION = "emetric_saved_views";
 
 export type Emetric_Metadata = {
   source?: string; // FRED, etc. 
@@ -81,3 +82,25 @@ export type Emetric_Derived_Timeseries_Definition = {
   alignmentStrategy: 'previous' | 'future' | 'nearest' | 'interpolate';
   formula: string;
 };
+
+// Type for TimeRange (imported from TimeRangeSelector)
+export type TimeRangePreset = '1y' | '2y' | '5y' | '10y' | '20y' | 'max' | 'custom';
+
+export interface TimeRange {
+  startDate: Date | null;
+  endDate: Date | null;
+  preset: TimeRangePreset;
+}
+
+// Type for saved graph views
+export interface Emetric_SavedView {
+  id: string;
+  name: string;
+  userId: string;
+  createdAt: number;
+  timeRange: TimeRange;
+  graphs: Array<{
+    id: string;
+    selectedMetrics: string[];
+  }>;
+}

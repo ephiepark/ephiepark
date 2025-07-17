@@ -10,10 +10,17 @@ import { TimeRange } from './TimeRangeSelector';
 interface GraphProps {
   id: string;
   timeRange?: TimeRange;
+  initialSelectedMetrics?: string[];
+  onMetricsChange?: (graphId: string, metrics: string[]) => void;
 }
 
-const Graph: React.FC<GraphProps> = ({ id, timeRange }) => {
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
+const Graph: React.FC<GraphProps> = ({ 
+  id, 
+  timeRange, 
+  initialSelectedMetrics = [], 
+  onMetricsChange 
+}) => {
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(initialSelectedMetrics);
   const [timeSeriesData, setTimeSeriesData] = useState<Record<string, Emetric_TimeSeries | null>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,13 +92,25 @@ const Graph: React.FC<GraphProps> = ({ id, timeRange }) => {
   // Handle metric selection/deselection
   const handleMetricToggle = (metricId: string) => {
     setSelectedMetrics(prev => {
-      if (prev.includes(metricId)) {
-        return prev.filter(id => id !== metricId);
-      } else {
-        return [...prev, metricId];
+      const newMetrics = prev.includes(metricId)
+        ? prev.filter(id => id !== metricId)
+        : [...prev, metricId];
+      
+      // Notify parent component if callback is provided
+      if (onMetricsChange) {
+        onMetricsChange(id, newMetrics);
       }
+      
+      return newMetrics;
     });
   };
+
+  // Update selected metrics when initialSelectedMetrics prop changes
+  useEffect(() => {
+    if (initialSelectedMetrics && initialSelectedMetrics.length > 0) {
+      setSelectedMetrics(initialSelectedMetrics);
+    }
+  }, [initialSelectedMetrics]);
 
   return (
     <div className="graph-container">

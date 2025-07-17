@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, doc, addDoc, query, orderBy, updateDoc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, addDoc, query, where, orderBy, updateDoc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { signInWithPopup, signOut as firebaseSignOut, User, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, auth, googleProvider, functions } from './config';
@@ -10,7 +10,9 @@ import {
   Emetric_Metric, 
   Emetric_TimeSeries, 
   EMETRIC_TIMESERIES_COLLECTION,
-  Emetric_Derived_Timeseries_Definition 
+  EMETRIC_SAVED_VIEWS_COLLECTION,
+  Emetric_Derived_Timeseries_Definition,
+  Emetric_SavedView
 } from '../shared/types';
 
 class FirebaseApi {
@@ -293,6 +295,7 @@ class FirebaseApi {
 
   // Emetric methods
   private readonly DERIVED_TIMESERIES_DEFINITIONS_COLLECTION = 'emetric_derived_timeseries_definitions';
+  private readonly SAVED_VIEWS_COLLECTION = EMETRIC_SAVED_VIEWS_COLLECTION;
 
   async getEmetricTimeSeries(metricId: string): Promise<Emetric_TimeSeries | null> {
     try {
@@ -329,6 +332,108 @@ class FirebaseApi {
     } catch (error) {
       console.error('Error fetching derived time series definitions:', error);
       throw new Error('Failed to fetch derived time series definitions');
+    }
+  }
+
+  // Saved Views methods
+  async saveEmetricView(view: Emetric_SavedView): Promise<string> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('Must be logged in to save views');
+
+      // Ensure the view has the current user's ID
+      const viewToSave = {
+        ...view,
+        userId: user.uid,
+        createdAt: Date.now()
+      };
+
+      // If no ID is provided, generate one
+      if (!viewToSave.id) {
+        viewToSave.id = crypto.randomUUID();
+      }
+
+      // Save the view to Firestore
+      const docRef = doc(db, this.SAVED_VIEWS_COLLECTION, viewToSave.id);
+      await setDoc(docRef, viewToSave);
+      return viewToSave.id;
+    } catch (error) {
+      console.error('Error saving emetric view:', error);
+      throw new Error('Failed to save view');
+    }
+  }
+
+  async getSavedEmetricViews(): Promise<Emetric_SavedView[]> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('Must be logged in to get saved views');
+
+      // Query views for the current user
+      const viewsQuery = query(
+        collection(db, this.SAVED_VIEWS_COLLECTION),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(viewsQuery);
+      return querySnapshot.docs.map(doc => doc.data() as Emetric_SavedView);
+    } catch (error) {
+      console.error('Error fetching saved emetric views:', error);
+      throw new Error('Failed to fetch saved views');
+    }
+  }
+
+  async getSavedEmetricView(id: string): Promise<Emetric_SavedView | null> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('Must be logged in to get saved views');
+
+      const docRef = doc(db, this.SAVED_VIEWS_COLLECTION, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return null;
+      }
+
+      const view = docSnap.data() as Emetric_SavedView;
+      
+      // Ensure the view belongs to the current user
+      if (view.userId !== user.uid) {
+        throw new Error('Unauthorized access to saved view');
+      }
+
+      return view;
+    } catch (error) {
+      console.error(`Error fetching saved emetric view ${id}:`, error);
+      throw new Error('Failed to fetch saved view');
+    }
+  }
+
+  async deleteSavedEmetricView(id: string): Promise<void> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('Must be logged in to delete saved views');
+
+      // First, get the view to check ownership
+      const docRef = doc(db, this.SAVED_VIEWS_COLLECTION, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        throw new Error('View not found');
+      }
+
+      const view = docSnap.data() as Emetric_SavedView;
+      
+      // Ensure the view belongs to the current user
+      if (view.userId !== user.uid) {
+        throw new Error('Unauthorized access to delete saved view');
+      }
+
+      // Delete the view
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error(`Error deleting saved emetric view ${id}:`, error);
+      throw new Error('Failed to delete saved view');
     }
   }
 }
