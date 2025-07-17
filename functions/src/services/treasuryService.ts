@@ -179,15 +179,17 @@ export class TreasuryService {
   }
 
   /**
-   * Fetches Treasury Bond Average Interest Rate data
+   * Fetches Average Interest Rate data for a specified security description
+   * @param securityDesc - The security description to filter by (e.g., "Treasury Bonds", "Total Marketable")
    * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
    */
-  async fetchTreasuryBondAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
+  async fetchAvgInterestRateData(securityDesc: string, startDate?: string): Promise<TreasuryMetricData[]> {
     const endpoint = "/accounting/od/avg_interest_rates";
+    const encodedSecurityDesc = encodeURIComponent(securityDesc);
     const filter = startDate 
-      ? `security_desc:eq:Treasury%20Bonds,record_date:gte:${startDate}`
-      : "security_desc:eq:Treasury%20Bonds";
+      ? `security_desc:eq:${encodedSecurityDesc},record_date:gte:${startDate}`
+      : `security_desc:eq:${encodedSecurityDesc}`;
     const pageSize = 1000;
     
     const url = `${this.config.baseUrl}${endpoint}?filter=${filter}&page[number]=1&page[size]=${pageSize}`;
@@ -201,6 +203,24 @@ export class TreasuryService {
         timestamp: new Date(item.record_date).getTime(),
         value: parseFloat(item.avg_interest_rate_amt),
       }));
+  }
+
+  /**
+   * Fetches Treasury Bond Average Interest Rate data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchTreasuryBondAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
+    return this.fetchAvgInterestRateData("Treasury Bonds", startDate);
+  }
+
+  /**
+   * Fetches Total Marketable Debt Average Interest Rate data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchMarketableDebtAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
+    return this.fetchAvgInterestRateData("Total Marketable", startDate);
   }
   /**
    * Fetches US Debt Expiration data from Treasury MSPD

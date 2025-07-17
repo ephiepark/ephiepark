@@ -3,6 +3,7 @@ import { Emetric_Metric } from "../../shared/types.js";
 import { asyncPopulateGDPData } from "./populateGDPData.js";
 import { asyncPopulateDebtGDPData } from "./populateDebtGDPData.js";
 import { asyncPopulateTreasuryBondAverageInterestRateData } from "./populateTreasuryBondAverageInterestRateData.js";
+import { asyncPopulateMarketableDebtAvgInterestRateData } from "./populateMarketableDebtAvgInterestRateData.js";
 import { asyncPopulateFederalReceiptsData } from "./populateFederalReceiptsData.js";
 import { asyncPopulateFederalExpendituresData } from "./populateFederalExpendituresData.js";
 import { asyncPopulateInterestPaymentsData } from "./populateInterestPaymentsData.js";
@@ -23,6 +24,7 @@ import { asyncPopulateMarketableDebtDaysToP90MaturityData } from "./populateMark
 import { asyncPopulateMarketableDebtAvgYieldByMaturityData } from "./populateMarketableDebtAvgYieldByMaturityData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
+  'treasury_us_marketable_debt_avg_interest_rate': asyncPopulateMarketableDebtAvgInterestRateData,
   'treasury_us_marketable_debt_avg_yield_by_maturity': asyncPopulateMarketableDebtAvgYieldByMaturityData,
   'treasury_us_total_marketable_debt': asyncPopulateTotalMarketableDebtData,
   'treasury_us_total_nonmarketable_debt': asyncPopulateTotalNonmarketableDebtData,
