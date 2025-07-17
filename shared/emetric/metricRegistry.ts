@@ -171,6 +171,26 @@ export const metricRegistry: Array<Emetric_Metric> = [
     } 
   },
   {
+    id: "treasury_treasury_bill_avg_interest_rates",
+    name: "Treasury Bill Average Interest Rate",
+    description: "Average interest rate of outstanding Treasury Bills",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "Treasury"
+    } 
+  },
+  {
+    id: "treasury_treasury_note_avg_interest_rates",
+    name: "Treasury Note Average Interest Rate",
+    description: "Average interest rate of outstanding Treasury Notes",
+    updateCycle: "daily",
+    unit: "percent",
+    metadata: {
+      source: "Treasury"
+    } 
+  },
+  {
     id: "fred_us_federal_receipts_id",
     name: "Federal Government Receipts",
     description: "Total receipts of the United States federal government. Total government revenue.",

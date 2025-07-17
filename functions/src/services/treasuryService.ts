@@ -215,6 +215,24 @@ export class TreasuryService {
   }
 
   /**
+   * Fetches Treasury Bill Average Interest Rate data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchTreasuryBillAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
+    return this.fetchAvgInterestRateData("Treasury Bills", startDate);
+  }
+
+  /**
+   * Fetches Treasury Note Average Interest Rate data
+   * @param startDate - Optional specific start date (YYYY-MM-DD format)
+   * @return The fetched metric data
+   */
+  async fetchTreasuryNoteAvgInterestRateData(startDate?: string): Promise<TreasuryMetricData[]> {
+    return this.fetchAvgInterestRateData("Treasury Notes", startDate);
+  }
+
+  /**
    * Fetches Total Marketable Debt Average Interest Rate data
    * @param startDate - Optional specific start date (YYYY-MM-DD format)
    * @return The fetched metric data
