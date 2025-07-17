@@ -20,10 +20,10 @@ import { asyncPopulateMarketableDebtDaysToP25MaturityData } from "./populateMark
 import { asyncPopulateMarketableDebtDaysToP50MaturityData } from "./populateMarketableDebtDaysToP50MaturityData.js";
 import { asyncPopulateMarketableDebtDaysToP75MaturityData } from "./populateMarketableDebtDaysToP75MaturityData.js";
 import { asyncPopulateMarketableDebtDaysToP90MaturityData } from "./populateMarketableDebtDaysToP90MaturityData.js";
-import { asyncPopulateMarketableDebtAvgYieldData } from "./populateMarketableDebtAvgYieldData.js";
+import { asyncPopulateMarketableDebtAvgYieldByMaturityData } from "./populateMarketableDebtAvgYieldByMaturityData.js";
 
 export const metricBuilderRegistry: Record<string, (db: Firestore, metric: Emetric_Metric) => Promise<void>> = {
-  'treasury_us_marketable_debt_avg_yield': asyncPopulateMarketableDebtAvgYieldData,
+  'treasury_us_marketable_debt_avg_yield_by_maturity': asyncPopulateMarketableDebtAvgYieldByMaturityData,
   'treasury_us_total_marketable_debt': asyncPopulateTotalMarketableDebtData,
   'treasury_us_total_nonmarketable_debt': asyncPopulateTotalNonmarketableDebtData,
   'treasury_us_marketable_debt_bills': asyncPopulateMarketableDebtBillsData,

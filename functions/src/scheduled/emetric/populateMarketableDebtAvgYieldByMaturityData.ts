@@ -32,7 +32,7 @@ function getLastDayOfPreviousMonth(): string {
  * @param db - Firestore database instance
  * @param metric - The metric definition
  */
-export const asyncPopulateMarketableDebtAvgYieldData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {
+export const asyncPopulateMarketableDebtAvgYieldByMaturityData = async (db: Firestore, metric: Emetric_Metric): Promise<void> => {
   try {
     logger.info("Starting asyncPopulateMarketableDebtAvgYieldData");
     
