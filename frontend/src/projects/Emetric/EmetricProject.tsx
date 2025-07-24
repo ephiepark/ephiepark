@@ -1,5 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useFirebase } from '../../firebase/FirebaseContext';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import FirebaseApi from '../../firebase/FirebaseApi';
 import LoginPrompt from '../../components/LoginPrompt';
 import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
@@ -12,6 +14,8 @@ import './components/SavedViewsManager.css';
 
 const EmetricProject: React.FC = () => {
   const { user } = useFirebase();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [graphs, setGraphs] = useState<string[]>(['graph-1']);
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [timeRange, setTimeRange] = useState<TimeRange>({
@@ -20,11 +24,35 @@ const EmetricProject: React.FC = () => {
     preset: 'max'
   });
   const [showSavedViews, setShowSavedViews] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   // Store selected metrics for each graph
   const selectedMetricsRef = useRef<Record<string, string[]>>({
     'graph-1': []
   });
+
+  // Load view from URL parameter when component mounts
+  useEffect(() => {
+    const loadViewFromUrl = async () => {
+      const viewId = searchParams.get('viewId');
+      if (viewId && user) {
+        try {
+          setIsLoading(true);
+          const api = FirebaseApi.getInstance();
+          const view = await api.getSavedEmetricView(viewId);
+          if (view) {
+            handleLoadSavedView(view, false); // Load view without updating URL
+          }
+        } catch (error) {
+          console.error('Error loading view from URL:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadViewFromUrl();
+  }, [searchParams, user]);
 
   // If user is not authenticated, show login prompt
   if (!user) {
@@ -74,7 +102,7 @@ const EmetricProject: React.FC = () => {
     return selectedMetricsRef.current[graphId] || [];
   };
 
-  const handleLoadSavedView = (view: Emetric_SavedView) => {
+  const handleLoadSavedView = (view: Emetric_SavedView, updateUrl: boolean = true) => {
     // Update time range
     setTimeRange(view.timeRange);
     
@@ -91,6 +119,11 @@ const EmetricProject: React.FC = () => {
     
     // Hide saved views panel after loading
     setShowSavedViews(false);
+
+    // Update URL with viewId parameter
+    if (updateUrl) {
+      setSearchParams({ viewId: view.id });
+    }
   };
 
   const toggleSavedViews = () => {
@@ -105,59 +138,65 @@ const EmetricProject: React.FC = () => {
       default:
         return (
           <>
-            <TimeRangeSelector 
-              selectedRange={timeRange}
-              onRangeChange={handleTimeRangeChange}
-            />
-            
-            {showSavedViews && (
-              <SavedViewsManager
-                graphs={graphs}
-                getSelectedMetricsForGraph={getSelectedMetricsForGraph}
-                timeRange={timeRange}
-                onLoadView={handleLoadSavedView}
-              />
-            )}
-            
-            <div className="emetric-actions">
-              <button className="add-graph-button" onClick={handleAddGraph}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                Add Graph
-              </button>
-              
-              <button className="saved-views-button" onClick={toggleSavedViews}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                  <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-                </svg>
-                {showSavedViews ? 'Hide Saved Views' : 'Show Saved Views'}
-              </button>
-            </div>
-            
-            <div className="graphs-container">
-              {graphs.map(graphId => (
-                <div key={graphId} className="graph-wrapper">
-                  <div className="graph-header">
-                    <button 
-                      className="remove-graph-button" 
-                      onClick={() => handleRemoveGraph(graphId)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                      </svg>
-                      Remove
-                    </button>
-                  </div>
-                  <Graph 
-                    id={graphId} 
-                    timeRange={timeRange} 
-                    initialSelectedMetrics={getSelectedMetricsForGraph(graphId)}
-                    onMetricsChange={handleMetricsChange}
+            {isLoading ? (
+              <div className="loading-indicator">Loading saved view...</div>
+            ) : (
+              <>
+                <TimeRangeSelector 
+                  selectedRange={timeRange}
+                  onRangeChange={handleTimeRangeChange}
+                />
+                
+                {showSavedViews && (
+                  <SavedViewsManager
+                    graphs={graphs}
+                    getSelectedMetricsForGraph={getSelectedMetricsForGraph}
+                    timeRange={timeRange}
+                    onLoadView={handleLoadSavedView}
                   />
+                )}
+                
+                <div className="emetric-actions">
+                  <button className="add-graph-button" onClick={handleAddGraph}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    Add Graph
+                  </button>
+                  
+                  <button className="saved-views-button" onClick={toggleSavedViews}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    {showSavedViews ? 'Hide Saved Views' : 'Show Saved Views'}
+                  </button>
                 </div>
-              ))}
-            </div>
+                
+                <div className="graphs-container">
+                  {graphs.map(graphId => (
+                    <div key={graphId} className="graph-wrapper">
+                      <div className="graph-header">
+                        <button 
+                          className="remove-graph-button" 
+                          onClick={() => handleRemoveGraph(graphId)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                          </svg>
+                          Remove
+                        </button>
+                      </div>
+                      <Graph 
+                        id={graphId} 
+                        timeRange={timeRange} 
+                        initialSelectedMetrics={getSelectedMetricsForGraph(graphId)}
+                        onMetricsChange={handleMetricsChange}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         );
     }
