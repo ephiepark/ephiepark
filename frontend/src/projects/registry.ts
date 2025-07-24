@@ -16,7 +16,7 @@ export const projectRegistry: Array<ProjectConfig> = [
     id: "emetric",
     name: "Emetric",
     description: "Economic metrics dashboard with data from various sources including FRED",
-    status: "development",
+    status: "active",
     permission: "all",
   },
   {
