@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProjectConfig } from '../shared/types';
 import EmetricProject from './Emetric/EmetricProject';
+import TimelineProject from './Timeline/TimelineProject';
 
 export const getProjectById = (id: string): ProjectConfig | null => {
   const ret = projectRegistry.find(project => project.id === id);
@@ -17,9 +18,17 @@ export const projectRegistry: Array<ProjectConfig> = [
     description: "Economic metrics dashboard with data from various sources including FRED",
     status: "development",
     permission: "all",
+  },
+  {
+    id: "timeline",
+    name: "Timeline",
+    description: "Visualize events and milestones on an interactive timeline",
+    status: "development",
+    permission: "all",
   }
 ];
 
 export const projectComponentRegistry: Record<string, React.FC> = {
-  'emetric': EmetricProject, 
+  'emetric': EmetricProject,
+  'timeline': TimelineProject,
 };
