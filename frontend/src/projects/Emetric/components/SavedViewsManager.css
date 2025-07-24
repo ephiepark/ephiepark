@@ -9,7 +9,7 @@
 .saved-views-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16px;
 }
 
@@ -17,6 +17,13 @@
   margin: 0;
   color: #ffffff;
   font-size: 18px;
+}
+
+.saved-views-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
 }
 
 .save-view-button {
@@ -40,6 +47,57 @@
 .save-view-button svg {
   width: 16px;
   height: 16px;
+}
+
+.currently-loaded-view {
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.currently-loaded-view p {
+  margin: 0 0 8px 0;
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.currently-loaded-view strong {
+  color: #ffffff;
+}
+
+.loaded-view-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.update-view-button, .save-as-view-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #2a2a2a;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.update-view-button:hover, .save-as-view-button:hover {
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+.update-view-button svg, .save-as-view-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.update-view-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .error-message {

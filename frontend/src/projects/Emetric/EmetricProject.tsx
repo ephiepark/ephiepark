@@ -25,6 +25,7 @@ const EmetricProject: React.FC = () => {
   });
   const [showSavedViews, setShowSavedViews] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentlyLoadedView, setCurrentlyLoadedView] = useState<Emetric_SavedView | undefined>(undefined);
   
   // Store selected metrics for each graph
   const selectedMetricsRef = useRef<Record<string, string[]>>({
@@ -120,6 +121,9 @@ const EmetricProject: React.FC = () => {
     // Hide saved views panel after loading
     setShowSavedViews(false);
 
+    // Set the currently loaded view
+    setCurrentlyLoadedView(view);
+
     // Update URL with viewId parameter
     if (updateUrl) {
       setSearchParams({ viewId: view.id });
@@ -153,6 +157,7 @@ const EmetricProject: React.FC = () => {
                     getSelectedMetricsForGraph={getSelectedMetricsForGraph}
                     timeRange={timeRange}
                     onLoadView={handleLoadSavedView}
+                    currentlyLoadedView={currentlyLoadedView}
                   />
                 )}
                 
