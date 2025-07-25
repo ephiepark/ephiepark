@@ -115,6 +115,24 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     selectedMetricsRef.current = updatedMetrics;
   };
 
+  const handleMoveGraphUp = (graphIdToMove: string) => {
+    const index = graphs.indexOf(graphIdToMove);
+    if (index > 0) {
+      const newGraphs = [...graphs];
+      [newGraphs[index], newGraphs[index - 1]] = [newGraphs[index - 1], newGraphs[index]];
+      setGraphs(newGraphs);
+    }
+  };
+
+  const handleMoveGraphDown = (graphIdToMove: string) => {
+    const index = graphs.indexOf(graphIdToMove);
+    if (index < graphs.length - 1) {
+      const newGraphs = [...graphs];
+      [newGraphs[index], newGraphs[index + 1]] = [newGraphs[index + 1], newGraphs[index]];
+      setGraphs(newGraphs);
+    }
+  };
+
   const handleViewChange = (view: string) => {
     setActiveView(view);
     
@@ -235,15 +253,37 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
                   {graphs.map(graphId => (
                     <div key={graphId} className="graph-wrapper">
                       <div className="graph-header">
-                        <button 
-                          className="remove-graph-button" 
-                          onClick={() => handleRemoveGraph(graphId)}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                          </svg>
-                          Remove
-                        </button>
+                        <div className="graph-controls">
+                          <button 
+                            className="move-graph-up-button" 
+                            onClick={() => handleMoveGraphUp(graphId)}
+                            disabled={graphs.indexOf(graphId) === 0}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M7 14l5-5 5 5z"/>
+                            </svg>
+                            Move Up
+                          </button>
+                          <button 
+                            className="move-graph-down-button" 
+                            onClick={() => handleMoveGraphDown(graphId)}
+                            disabled={graphs.indexOf(graphId) === graphs.length - 1}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                            Move Down
+                          </button>
+                          <button 
+                            className="remove-graph-button" 
+                            onClick={() => handleRemoveGraph(graphId)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            Remove
+                          </button>
+                        </div>
                       </div>
                       <Graph 
                         id={graphId} 

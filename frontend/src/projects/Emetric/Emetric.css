@@ -239,6 +239,38 @@
   margin-bottom: 0.5rem;
 }
 
+.graph-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.move-graph-up-button, .move-graph-down-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.move-graph-up-button:hover, .move-graph-down-button:hover {
+  background-color: #357ab8;
+}
+
+.move-graph-up-button:disabled, .move-graph-down-button:disabled {
+  background-color: rgba(74, 144, 226, 0.5);
+  cursor: not-allowed;
+}
+
+.move-graph-up-button svg, .move-graph-down-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 .remove-graph-button {
   background-color: #d93025;
   color: white;
