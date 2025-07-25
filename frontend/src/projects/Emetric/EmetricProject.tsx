@@ -31,6 +31,11 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
   const [showSavedViews, setShowSavedViews] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentlyLoadedView, setCurrentlyLoadedView] = useState<Emetric_SavedView | undefined>(undefined);
+  const [updateInProgress, setUpdateInProgress] = useState<boolean>(false);
+  const [showSaveAsModal, setShowSaveAsModal] = useState<boolean>(false);
+  const [viewName, setViewName] = useState<string>('');
+  const [saveInProgress, setSaveInProgress] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Store selected metrics for each graph
   const selectedMetricsRef = useRef<Record<string, string[]>>({
@@ -156,6 +161,77 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     return selectedMetricsRef.current[graphId] || [];
   };
 
+  const handleUpdateView = async () => {
+    if (!currentlyLoadedView) {
+      setError('No view is currently loaded');
+      return;
+    }
+
+    try {
+      setUpdateInProgress(true);
+      
+      // Create a view object with the current state but keep the original ID, name, and userId
+      const graphsData = graphs.map(graphId => ({
+        id: graphId,
+        selectedMetrics: getSelectedMetricsForGraph(graphId)
+      }));
+
+      const updatedView: Emetric_SavedView = {
+        ...currentlyLoadedView,
+        timeRange,
+        graphs: graphsData
+      };
+
+      const api = FirebaseApi.getInstance();
+      await api.saveEmetricView(updatedView);
+      
+      setUpdateInProgress(false);
+      setError(null);
+    } catch (err) {
+      console.error('Error updating view:', err);
+      setError('Failed to update view. Please try again later.');
+      setUpdateInProgress(false);
+    }
+  };
+
+  const handleSaveViewAs = async () => {
+    if (!viewName.trim()) {
+      setError('Please enter a name for this view');
+      return;
+    }
+
+    try {
+      setSaveInProgress(true);
+      
+      // Create a view object with the current state
+      const graphsData = graphs.map(graphId => ({
+        id: graphId,
+        selectedMetrics: getSelectedMetricsForGraph(graphId)
+      }));
+
+      const view: Emetric_SavedView = {
+        id: '', // Will be set by the API
+        name: viewName.trim(),
+        userId: '', // Will be set by the API
+        createdAt: Date.now(),
+        timeRange,
+        graphs: graphsData
+      };
+
+      const api = FirebaseApi.getInstance();
+      await api.saveEmetricView(view);
+      
+      // Reset the form
+      setViewName('');
+      setShowSaveAsModal(false);
+      setSaveInProgress(false);
+    } catch (err) {
+      console.error('Error saving view:', err);
+      setError('Failed to save view. Please try again later.');
+      setSaveInProgress(false);
+    }
+  };
+
   const handleLoadSavedView = (view: Emetric_SavedView, navigateToDashboard: boolean = false, updateUrl: boolean = true) => {
     // Update time range
     setTimeRange(view.timeRange);
@@ -215,8 +291,31 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
                 {currentlyLoadedView && (
                   <div className="loaded-view-display">
                     <h3>Current View: <span className="loaded-view-name">{currentlyLoadedView.name}</span></h3>
+                    <div className="loaded-view-actions">
+                      <button 
+                        className="update-view-button"
+                        onClick={handleUpdateView}
+                        disabled={updateInProgress}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                          <path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58s9.14-3.47 12.65 0L21 3v7.12zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"/>
+                        </svg>
+                        Update View
+                      </button>
+                      <button 
+                        className="save-as-view-button"
+                        onClick={() => setShowSaveAsModal(true)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                          <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/>
+                        </svg>
+                        Save Current View As
+                      </button>
+                    </div>
                   </div>
                 )}
+                
+                {error && <div className="error-message">{error}</div>}
                 
                 <TimeRangeSelector 
                   selectedRange={timeRange}
@@ -301,6 +400,74 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     }
   };
 
+  // Save As Modal
+  const renderSaveAsModal = () => {
+    if (!showSaveAsModal) return null;
+    
+    return (
+      <div className="modal-overlay">
+        <div className="save-view-modal">
+          <div className="modal-header">
+            <h3>Save Current View As</h3>
+            <button 
+              className="close-modal-button"
+              onClick={() => setShowSaveAsModal(false)}
+              disabled={saveInProgress}
+            >
+              ×
+            </button>
+          </div>
+          <div className="modal-content">
+            <div className="form-group">
+              <label htmlFor="view-name-as">View Name</label>
+              <input
+                type="text"
+                id="view-name-as"
+                className="form-control"
+                value={viewName}
+                onChange={(e) => setViewName(e.target.value)}
+                placeholder="Enter a name for this view"
+                disabled={saveInProgress}
+              />
+            </div>
+            <div className="view-summary">
+              <p>This view contains:</p>
+              <ul>
+                <li>{graphs.length} graph{graphs.length !== 1 ? 's' : ''}</li>
+                <li>
+                  {graphs.reduce((total, graphId) => {
+                    const metrics = getSelectedMetricsForGraph(graphId);
+                    return total + metrics.length;
+                  }, 0)} selected metric{graphs.reduce((total, graphId) => {
+                    const metrics = getSelectedMetricsForGraph(graphId);
+                    return total + metrics.length;
+                  }, 0) !== 1 ? 's' : ''}
+                </li>
+                <li>Time range: {timeRange.preset}</li>
+              </ul>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button 
+              className="cancel-button"
+              onClick={() => setShowSaveAsModal(false)}
+              disabled={saveInProgress}
+            >
+              Cancel
+            </button>
+            <button 
+              className="save-button"
+              onClick={handleSaveViewAs}
+              disabled={!viewName.trim() || saveInProgress}
+            >
+              {saveInProgress ? 'Saving...' : 'Save View'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="emetric-project-container">
       <div className="emetric-header">
@@ -310,6 +477,7 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
       <EmetricNavBar activeView={activeView} onViewChange={handleViewChange} />
       
       {renderContent()}
+      {renderSaveAsModal()}
     </div>
   );
 };

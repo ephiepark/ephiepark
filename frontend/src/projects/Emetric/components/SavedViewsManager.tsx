@@ -200,27 +200,6 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
           {currentlyLoadedView ? (
             <div className="currently-loaded-view">
               <p>Currently loaded: <strong>{currentlyLoadedView.name}</strong></p>
-              <div className="loaded-view-actions">
-                <button 
-                  className="update-view-button"
-                  onClick={handleUpdateView}
-                  disabled={updateInProgress}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                    <path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58s9.14-3.47 12.65 0L21 3v7.12zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"/>
-                  </svg>
-                  Update View
-                </button>
-                <button 
-                  className="save-as-view-button"
-                  onClick={() => setShowSaveAsModal(true)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/>
-                  </svg>
-                  Save Current View As
-                </button>
-              </div>
             </div>
           ) : (
             <button 
