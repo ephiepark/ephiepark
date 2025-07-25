@@ -13,6 +13,16 @@ const MetricsList: React.FC<MetricsListProps> = ({
   selectedMetrics, 
   onMetricToggle 
 }) => {
+  // Sort metrics to show selected metrics at the top
+  const sortedMetrics = [...metrics].sort((a, b) => {
+    const aSelected = selectedMetrics.includes(a.id);
+    const bSelected = selectedMetrics.includes(b.id);
+    
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
+    return 0;
+  });
+
   return (
     <div className="metrics-list">
       <h3>Available Metrics</h3>
@@ -20,8 +30,8 @@ const MetricsList: React.FC<MetricsListProps> = ({
         <p>No metrics available</p>
       ) : (
         <ul className="metrics-list-items">
-          {metrics.map(metric => (
-            <li key={metric.id} className="metric-item">
+          {sortedMetrics.map(metric => (
+            <li key={metric.id} className={`metric-item ${selectedMetrics.includes(metric.id) ? 'selected-metric' : ''}`}>
               <label className="metric-label">
                 <input
                   type="checkbox"

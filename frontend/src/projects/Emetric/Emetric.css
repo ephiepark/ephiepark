@@ -410,6 +410,15 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.metric-item.selected-metric {
+  background-color: rgba(26, 115, 232, 0.1);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  border-left: 3px solid #1a73e8;
+}
+
 .metric-item:last-child {
   margin-bottom: 0;
   padding-bottom: 0;
