@@ -85,9 +85,34 @@
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
+}
+
+/* Loaded View Display Styles */
+.loaded-view-display {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+}
+
+.loaded-view-display h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.loaded-view-name {
+  font-weight: 600;
+  color: #1a73e8;
+  margin-left: 0.5rem;
 }
 
 .emetric-navbar-items {

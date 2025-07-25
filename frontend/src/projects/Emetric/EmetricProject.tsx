@@ -146,6 +146,12 @@ const EmetricProject: React.FC = () => {
               <div className="loading-indicator">Loading saved view...</div>
             ) : (
               <>
+                {currentlyLoadedView && (
+                  <div className="loaded-view-display">
+                    <h3>Current View: <span className="loaded-view-name">{currentlyLoadedView.name}</span></h3>
+                  </div>
+                )}
+                
                 <TimeRangeSelector 
                   selectedRange={timeRange}
                   onRangeChange={handleTimeRangeChange}
