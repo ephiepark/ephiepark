@@ -10,9 +10,12 @@ const EmetricNavBar: React.FC<EmetricNavBarProps> = ({ activeView, onViewChange 
   const [searchParams] = useSearchParams();
   const viewId = searchParams.get('viewId');
   
-  // Helper function to generate the URL with viewId if it exists
+  // Helper function to generate the URL with viewId if it exists and only for dashboard tab
   const getTabUrl = (tab: string) => {
-    return viewId ? `/projects/emetric/${tab}?viewId=${viewId}` : `/projects/emetric/${tab}`;
+    // Only include viewId for dashboard tab
+    return (viewId && tab === 'dashboard') ? 
+      `/projects/emetric/${tab}?viewId=${viewId}` : 
+      `/projects/emetric/${tab}`;
   };
 
   return (

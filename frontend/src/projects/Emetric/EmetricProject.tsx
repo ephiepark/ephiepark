@@ -121,8 +121,8 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     // Update URL to reflect the current view
     const viewId = searchParams.get('viewId');
     
-    // Preserve the viewId parameter if it exists
-    if (viewId) {
+    // Only preserve the viewId parameter for dashboard view
+    if (viewId && view === 'dashboard') {
       navigate(`/projects/emetric/${view}?viewId=${viewId}`);
     } else {
       navigate(`/projects/emetric/${view}`);
@@ -159,10 +159,15 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     // Set the currently loaded view
     setCurrentlyLoadedView(view);
 
-    // Update URL with viewId parameter
+    // Update URL with viewId parameter only for dashboard view
     if (updateUrl) {
-      // Navigate to the current view with the viewId parameter
-      navigate(`/projects/emetric/${activeView}?viewId=${view.id}`);
+      if (activeView === 'dashboard') {
+        // Only include viewId parameter for dashboard view
+        navigate(`/projects/emetric/${activeView}?viewId=${view.id}`);
+      } else {
+        // For other views, don't include viewId parameter
+        navigate(`/projects/emetric/${activeView}`);
+      }
     }
   };
 
