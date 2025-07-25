@@ -67,7 +67,7 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
           const api = FirebaseApi.getInstance();
           const view = await api.getSavedEmetricView(viewId);
           if (view) {
-            handleLoadSavedView(view, false); // Load view without updating URL
+            handleLoadSavedView(view, false, false); // Load view without updating URL or navigating
           }
         } catch (error) {
           console.error('Error loading view from URL:', error);
@@ -138,7 +138,7 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     return selectedMetricsRef.current[graphId] || [];
   };
 
-  const handleLoadSavedView = (view: Emetric_SavedView, updateUrl: boolean = true) => {
+  const handleLoadSavedView = (view: Emetric_SavedView, navigateToDashboard: boolean = false, updateUrl: boolean = true) => {
     // Update time range
     setTimeRange(view.timeRange);
     
@@ -159,11 +159,16 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     // Set the currently loaded view
     setCurrentlyLoadedView(view);
 
-    // Update URL with viewId parameter only for dashboard view
+    // If navigateToDashboard is true, change the active view to dashboard
+    if (navigateToDashboard) {
+      setActiveView('dashboard');
+    }
+
+    // Update URL with viewId parameter
     if (updateUrl) {
-      if (activeView === 'dashboard') {
-        // Only include viewId parameter for dashboard view
-        navigate(`/projects/emetric/${activeView}?viewId=${view.id}`);
+      // If navigating to dashboard or already on dashboard, include viewId
+      if (navigateToDashboard || activeView === 'dashboard') {
+        navigate(`/projects/emetric/dashboard?viewId=${view.id}`);
       } else {
         // For other views, don't include viewId parameter
         navigate(`/projects/emetric/${activeView}`);

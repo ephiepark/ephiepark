@@ -7,7 +7,7 @@ interface SavedViewsManagerProps {
   graphs: string[];
   getSelectedMetricsForGraph: (graphId: string) => string[];
   timeRange: TimeRange;
-  onLoadView: (view: Emetric_SavedView) => void;
+  onLoadView: (view: Emetric_SavedView, navigateToDashboard?: boolean, updateUrl?: boolean) => void;
   currentlyLoadedView?: Emetric_SavedView;
 }
 
@@ -184,7 +184,8 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
   };
 
   const handleLoadView = (view: Emetric_SavedView) => {
-    onLoadView(view);
+    // When loading a view from the saved views manager, don't navigate to dashboard
+    onLoadView(view, false);
   };
 
   const formatDate = (timestamp: number): string => {

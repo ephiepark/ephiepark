@@ -4,7 +4,7 @@ import { Emetric_SavedView } from '../../../shared/types';
 import './SavedViewsManager.css'; // Reuse existing styles
 
 interface SavedViewsListProps {
-  onLoadView: (view: Emetric_SavedView) => void;
+  onLoadView: (view: Emetric_SavedView, navigateToDashboard?: boolean) => void;
 }
 
 const SavedViewsList: React.FC<SavedViewsListProps> = ({ onLoadView }) => {
@@ -48,7 +48,8 @@ const SavedViewsList: React.FC<SavedViewsListProps> = ({ onLoadView }) => {
   };
 
   const handleLoadView = (view: Emetric_SavedView) => {
-    onLoadView(view);
+    // When loading a view from the saved views list, navigate to dashboard
+    onLoadView(view, true);
   };
 
   const formatDate = (timestamp: number): string => {
