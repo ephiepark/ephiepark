@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import FirebaseApi from '../../../firebase/FirebaseApi';
-import { Emetric_SavedView, TimeRange } from '../../../shared/types';
+import { Emetric_SavedView, TimeRange, Emetric_GraphModule, Emetric_TextBoxModule } from '../../../shared/types';
 import './SavedViewsManager.css';
 
 interface SavedViewsManagerProps {
-  graphs: string[];
-  getSelectedMetricsForGraph: (graphId: string) => string[];
+  modules: Array<Emetric_GraphModule | Emetric_TextBoxModule>;
   timeRange: TimeRange;
   onLoadView: (view: Emetric_SavedView, navigateToDashboard?: boolean, updateUrl?: boolean) => void;
   currentlyLoadedView?: Emetric_SavedView;
 }
 
 const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
-  graphs,
-  getSelectedMetricsForGraph,
+  modules,
   timeRange,
   onLoadView,
   currentlyLoadedView
 }) => {
+  // Function to get all graph modules
+  const getGraphModules = () => {
+    return modules.filter(module => module.type === 'graph') as Emetric_GraphModule[];
+  };
+
+  // Function to get all text box modules
+  const getTextBoxModules = () => {
+    return modules.filter(module => module.type === 'text-box') as Emetric_TextBoxModule[];
+  };
   const [savedViews, setSavedViews] = useState<Emetric_SavedView[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,19 +63,13 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
     try {
       setSaveInProgress(true);
       
-      // Create a view object with the current state
-      const graphsData = graphs.map(graphId => ({
-        id: graphId,
-        selectedMetrics: getSelectedMetricsForGraph(graphId)
-      }));
-
       const view: Emetric_SavedView = {
         id: '', // Will be set by the API
         name: viewName.trim(),
         userId: '', // Will be set by the API
         createdAt: Date.now(),
         timeRange,
-        graphs: graphsData
+        modules
       };
 
       const api = FirebaseApi.getInstance();
@@ -97,16 +98,10 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
     try {
       setUpdateInProgress(true);
       
-      // Create a view object with the current state but keep the original ID, name, and userId
-      const graphsData = graphs.map(graphId => ({
-        id: graphId,
-        selectedMetrics: getSelectedMetricsForGraph(graphId)
-      }));
-
       const updatedView: Emetric_SavedView = {
         ...currentlyLoadedView,
         timeRange,
-        graphs: graphsData
+        modules
       };
 
       const api = FirebaseApi.getInstance();
@@ -133,19 +128,13 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
     try {
       setSaveInProgress(true);
       
-      // Create a view object with the current state
-      const graphsData = graphs.map(graphId => ({
-        id: graphId,
-        selectedMetrics: getSelectedMetricsForGraph(graphId)
-      }));
-
       const view: Emetric_SavedView = {
         id: '', // Will be set by the API
         name: viewName.trim(),
         userId: '', // Will be set by the API
         createdAt: Date.now(),
         timeRange,
-        graphs: graphsData
+        modules
       };
 
       const api = FirebaseApi.getInstance();
@@ -231,8 +220,26 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
                 <h4>{view.name}</h4>
                 <p className="saved-view-date">Saved on {formatDate(view.createdAt)}</p>
                 <p className="saved-view-details">
-                  {view.graphs.length} graph{view.graphs.length !== 1 ? 's' : ''} • 
-                  {view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0)} metric{view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0) !== 1 ? 's' : ''}
+                  {view.modules ? (
+                    <>
+                      {view.modules.filter(m => m.type === 'graph').length} graph{view.modules.filter(m => m.type === 'graph').length !== 1 ? 's' : ''} • 
+                      {view.modules.filter(m => m.type === 'text-box').length} text box{view.modules.filter(m => m.type === 'text-box').length !== 1 ? 'es' : ''} • 
+                      {view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
+                        const graphModule = module as Emetric_GraphModule;
+                        return total + graphModule.selectedMetrics.length;
+                      }, 0)} metric{view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
+                        const graphModule = module as Emetric_GraphModule;
+                        return total + graphModule.selectedMetrics.length;
+                      }, 0) !== 1 ? 's' : ''}
+                    </>
+                  ) : view.graphs ? (
+                    <>
+                      {view.graphs.length} graph{view.graphs.length !== 1 ? 's' : ''} • 
+                      {view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0)} metric{view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0) !== 1 ? 's' : ''}
+                    </>
+                  ) : (
+                    'No modules or graphs'
+                  )}
                 </p>
               </div>
               <div className="saved-view-actions">
@@ -287,14 +294,13 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
               <div className="view-summary">
                 <p>This view contains:</p>
                 <ul>
-                  <li>{graphs.length} graph{graphs.length !== 1 ? 's' : ''}</li>
+                  <li>{getGraphModules().length} graph{getGraphModules().length !== 1 ? 's' : ''}</li>
+                  <li>{getTextBoxModules().length} text box{getTextBoxModules().length !== 1 ? 'es' : ''}</li>
                   <li>
-                    {graphs.reduce((total, graphId) => {
-                      const metrics = getSelectedMetricsForGraph(graphId);
-                      return total + metrics.length;
-                    }, 0)} selected metric{graphs.reduce((total, graphId) => {
-                      const metrics = getSelectedMetricsForGraph(graphId);
-                      return total + metrics.length;
+                    {getGraphModules().reduce((total, module) => {
+                      return total + module.selectedMetrics.length;
+                    }, 0)} selected metric{getGraphModules().reduce((total, module) => {
+                      return total + module.selectedMetrics.length;
                     }, 0) !== 1 ? 's' : ''}
                   </li>
                   <li>Time range: {timeRange.preset}</li>
@@ -350,14 +356,13 @@ const SavedViewsManager: React.FC<SavedViewsManagerProps> = ({
               <div className="view-summary">
                 <p>This view contains:</p>
                 <ul>
-                  <li>{graphs.length} graph{graphs.length !== 1 ? 's' : ''}</li>
+                  <li>{getGraphModules().length} graph{getGraphModules().length !== 1 ? 's' : ''}</li>
+                  <li>{getTextBoxModules().length} text box{getTextBoxModules().length !== 1 ? 'es' : ''}</li>
                   <li>
-                    {graphs.reduce((total, graphId) => {
-                      const metrics = getSelectedMetricsForGraph(graphId);
-                      return total + metrics.length;
-                    }, 0)} selected metric{graphs.reduce((total, graphId) => {
-                      const metrics = getSelectedMetricsForGraph(graphId);
-                      return total + metrics.length;
+                    {getGraphModules().reduce((total, module) => {
+                      return total + module.selectedMetrics.length;
+                    }, 0)} selected metric{getGraphModules().reduce((total, module) => {
+                      return total + module.selectedMetrics.length;
                     }, 0) !== 1 ? 's' : ''}
                   </li>
                   <li>Time range: {timeRange.preset}</li>

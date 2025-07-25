@@ -1,0 +1,22 @@
+.text-box-module {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.text-box-content {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.text-box-content:focus {
+  outline: none;
+}

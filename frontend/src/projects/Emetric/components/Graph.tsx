@@ -12,13 +12,23 @@ interface GraphProps {
   timeRange?: TimeRange;
   initialSelectedMetrics?: string[];
   onMetricsChange?: (graphId: string, metrics: string[]) => void;
+  onMoveUp?: (id: string) => void;
+  onMoveDown?: (id: string) => void;
+  onRemove?: (id: string) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 const Graph: React.FC<GraphProps> = ({ 
   id, 
   timeRange, 
   initialSelectedMetrics = [], 
-  onMetricsChange 
+  onMetricsChange,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  isFirst = false,
+  isLast = false
 }) => {
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(initialSelectedMetrics);
   const [timeSeriesData, setTimeSeriesData] = useState<Record<string, Emetric_TimeSeries | null>>({});
@@ -113,7 +123,46 @@ const Graph: React.FC<GraphProps> = ({
   }, [initialSelectedMetrics]);
 
   return (
-    <div className="graph-container">
+    <div className="module graph-module">
+      <div className="module-header">
+        <div className="module-controls">
+          {onMoveUp && (
+            <button 
+              className="move-up-button" 
+              onClick={() => onMoveUp(id)}
+              disabled={isFirst}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 14l5-5 5 5z"/>
+              </svg>
+              Move Up
+            </button>
+          )}
+          {onMoveDown && (
+            <button 
+              className="move-down-button" 
+              onClick={() => onMoveDown(id)}
+              disabled={isLast}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 10l5 5 5-5z"/>
+              </svg>
+              Move Down
+            </button>
+          )}
+          {onRemove && (
+            <button 
+              className="remove-button" 
+              onClick={() => onRemove(id)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
       {error && <div className="error-message">{error}</div>}
       
       <div className="graph-content">

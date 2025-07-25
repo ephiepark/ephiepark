@@ -4,12 +4,13 @@ import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import FirebaseApi from '../../firebase/FirebaseApi';
 import LoginPrompt from '../../components/LoginPrompt';
 import Graph from './components/Graph';
+import TextBoxModule from './components/TextBoxModule';
 import EmetricNavBar from './components/EmetricNavBar';
 import MetricExplorer from './components/MetricExplorer';
 import SavedViewsManager from './components/SavedViewsManager';
 import SavedViewsList from './components/SavedViewsList';
 import TimeRangeSelector, { TimeRange } from './components/TimeRangeSelector';
-import { Emetric_SavedView } from '../../shared/types';
+import { Emetric_SavedView, Emetric_GraphModule, Emetric_TextBoxModule, Emetric_Module } from '../../shared/types';
 import './Emetric.css';
 import './components/SavedViewsManager.css';
 
@@ -21,7 +22,14 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
   const { user } = useFirebase();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [graphs, setGraphs] = useState<string[]>(['graph-1']);
+  const [modules, setModules] = useState<Array<Emetric_GraphModule | Emetric_TextBoxModule>>([
+    {
+      id: 'graph-1',
+      type: 'graph',
+      position: 0,
+      selectedMetrics: []
+    }
+  ]);
   const [activeView, setActiveView] = useState<string>(initialTab || 'dashboard');
   const [timeRange, setTimeRange] = useState<TimeRange>({
     startDate: null,
@@ -37,10 +45,15 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
   const [saveInProgress, setSaveInProgress] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Store selected metrics for each graph
-  const selectedMetricsRef = useRef<Record<string, string[]>>({
-    'graph-1': []
-  });
+  // Function to get all graph modules
+  const getGraphModules = () => {
+    return modules.filter(module => module.type === 'graph') as Emetric_GraphModule[];
+  };
+
+  // Function to get all text box modules
+  const getTextBoxModules = () => {
+    return modules.filter(module => module.type === 'text-box') as Emetric_TextBoxModule[];
+  };
 
   // Effect to sync the URL with the active view when initialTab changes
   useEffect(() => {
@@ -105,36 +118,50 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     setTimeRange(newRange);
   };
 
+  // Function to add a new graph module
   const handleAddGraph = () => {
-    const newGraphId = `graph-${graphs.length + 1}`;
-    setGraphs([...graphs, newGraphId]);
-    // Initialize empty selected metrics for the new graph
-    selectedMetricsRef.current[newGraphId] = [];
+    const newModule: Emetric_GraphModule = {
+      id: `graph-${Date.now()}`,
+      type: 'graph',
+      position: modules.length,
+      selectedMetrics: []
+    };
+    setModules([...modules, newModule]);
   };
 
-  const handleRemoveGraph = (graphIdToRemove: string) => {
-    setGraphs(graphs.filter(graphId => graphId !== graphIdToRemove));
-    // Clean up selected metrics for the removed graph
-    const updatedMetrics = { ...selectedMetricsRef.current };
-    delete updatedMetrics[graphIdToRemove];
-    selectedMetricsRef.current = updatedMetrics;
+  // Function to add a new text box module
+  const handleAddTextBox = () => {
+    const newModule: Emetric_TextBoxModule = {
+      id: `text-box-${Date.now()}`,
+      type: 'text-box',
+      position: modules.length,
+      content: ''
+    };
+    setModules([...modules, newModule]);
   };
 
-  const handleMoveGraphUp = (graphIdToMove: string) => {
-    const index = graphs.indexOf(graphIdToMove);
+  // Function to handle module removal
+  const handleRemoveModule = (moduleId: string) => {
+    setModules(modules.filter(module => module.id !== moduleId));
+  };
+
+  // Function to handle moving modules up
+  const handleMoveModuleUp = (moduleId: string) => {
+    const index = modules.findIndex(module => module.id === moduleId);
     if (index > 0) {
-      const newGraphs = [...graphs];
-      [newGraphs[index], newGraphs[index - 1]] = [newGraphs[index - 1], newGraphs[index]];
-      setGraphs(newGraphs);
+      const newModules = [...modules];
+      [newModules[index], newModules[index - 1]] = [newModules[index - 1], newModules[index]];
+      setModules(newModules);
     }
   };
 
-  const handleMoveGraphDown = (graphIdToMove: string) => {
-    const index = graphs.indexOf(graphIdToMove);
-    if (index < graphs.length - 1) {
-      const newGraphs = [...graphs];
-      [newGraphs[index], newGraphs[index + 1]] = [newGraphs[index + 1], newGraphs[index]];
-      setGraphs(newGraphs);
+  // Function to handle moving modules down
+  const handleMoveModuleDown = (moduleId: string) => {
+    const index = modules.findIndex(module => module.id === moduleId);
+    if (index < modules.length - 1) {
+      const newModules = [...modules];
+      [newModules[index], newModules[index + 1]] = [newModules[index + 1], newModules[index]];
+      setModules(newModules);
     }
   };
 
@@ -152,13 +179,22 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     }
   };
 
+  // Function to handle metrics change for graph modules
   const handleMetricsChange = (graphId: string, metrics: string[]) => {
-    // Update the selected metrics for the graph
-    selectedMetricsRef.current[graphId] = metrics;
+    setModules(modules.map(module => 
+      module.id === graphId && module.type === 'graph'
+        ? { ...module, selectedMetrics: metrics }
+        : module
+    ));
   };
 
-  const getSelectedMetricsForGraph = (graphId: string): string[] => {
-    return selectedMetricsRef.current[graphId] || [];
+  // Function to handle content change for text box modules
+  const handleTextBoxContentChange = (textBoxId: string, content: string) => {
+    setModules(modules.map(module => 
+      module.id === textBoxId && module.type === 'text-box'
+        ? { ...module, content }
+        : module
+    ));
   };
 
   const handleUpdateView = async () => {
@@ -170,16 +206,10 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     try {
       setUpdateInProgress(true);
       
-      // Create a view object with the current state but keep the original ID, name, and userId
-      const graphsData = graphs.map(graphId => ({
-        id: graphId,
-        selectedMetrics: getSelectedMetricsForGraph(graphId)
-      }));
-
       const updatedView: Emetric_SavedView = {
         ...currentlyLoadedView,
         timeRange,
-        graphs: graphsData
+        modules
       };
 
       const api = FirebaseApi.getInstance();
@@ -203,19 +233,13 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     try {
       setSaveInProgress(true);
       
-      // Create a view object with the current state
-      const graphsData = graphs.map(graphId => ({
-        id: graphId,
-        selectedMetrics: getSelectedMetricsForGraph(graphId)
-      }));
-
       const view: Emetric_SavedView = {
         id: '', // Will be set by the API
         name: viewName.trim(),
         userId: '', // Will be set by the API
         createdAt: Date.now(),
         timeRange,
-        graphs: graphsData
+        modules
       };
 
       const api = FirebaseApi.getInstance();
@@ -236,16 +260,19 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     // Update time range
     setTimeRange(view.timeRange);
     
-    // Update graphs and their selected metrics
-    const newGraphs = view.graphs.map(graph => graph.id);
-    setGraphs(newGraphs);
-    
-    // Update selected metrics for each graph
-    const newSelectedMetrics: Record<string, string[]> = {};
-    view.graphs.forEach(graph => {
-      newSelectedMetrics[graph.id] = graph.selectedMetrics;
-    });
-    selectedMetricsRef.current = newSelectedMetrics;
+    // Handle both new module structure and legacy graphs structure
+    if (view.modules) {
+      setModules(view.modules);
+    } else if (view.graphs) {
+      // Convert legacy graphs to modules
+      const convertedModules: Array<Emetric_GraphModule> = view.graphs.map((graph, index) => ({
+        id: graph.id,
+        type: 'graph',
+        position: index,
+        selectedMetrics: graph.selectedMetrics
+      }));
+      setModules(convertedModules);
+    }
     
     // Hide saved views panel after loading
     setShowSavedViews(false);
@@ -324,8 +351,7 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
                 
                 {showSavedViews && (
                   <SavedViewsManager
-                    graphs={graphs}
-                    getSelectedMetricsForGraph={getSelectedMetricsForGraph}
+                    modules={modules}
                     timeRange={timeRange}
                     onLoadView={handleLoadSavedView}
                     currentlyLoadedView={currentlyLoadedView}
@@ -335,9 +361,17 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
                 <div className="emetric-actions">
                   <button className="add-graph-button" onClick={handleAddGraph}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/>
                     </svg>
                     Add Graph
+                  </button>
+                  
+                  <button className="add-text-box-button" onClick={handleAddTextBox}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                      <path d="M18 9h-4V5h-4v4H6v4h4v4h4v-4h4z"/>
+                    </svg>
+                    Add Text Box
                   </button>
                   
                   <button className="saved-views-button" onClick={toggleSavedViews}>
@@ -348,48 +382,33 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
                   </button>
                 </div>
                 
-                <div className="graphs-container">
-                  {graphs.map(graphId => (
-                    <div key={graphId} className="graph-wrapper">
-                      <div className="graph-header">
-                        <div className="graph-controls">
-                          <button 
-                            className="move-graph-up-button" 
-                            onClick={() => handleMoveGraphUp(graphId)}
-                            disabled={graphs.indexOf(graphId) === 0}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M7 14l5-5 5 5z"/>
-                            </svg>
-                            Move Up
-                          </button>
-                          <button 
-                            className="move-graph-down-button" 
-                            onClick={() => handleMoveGraphDown(graphId)}
-                            disabled={graphs.indexOf(graphId) === graphs.length - 1}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M7 10l5 5 5-5z"/>
-                            </svg>
-                            Move Down
-                          </button>
-                          <button 
-                            className="remove-graph-button" 
-                            onClick={() => handleRemoveGraph(graphId)}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                            </svg>
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                      <Graph 
-                        id={graphId} 
-                        timeRange={timeRange} 
-                        initialSelectedMetrics={getSelectedMetricsForGraph(graphId)}
-                        onMetricsChange={handleMetricsChange}
-                      />
+                <div className="modules-container">
+                  {modules.map((module, index) => (
+                    <div key={module.id} className="module-wrapper">
+                      {module.type === 'graph' ? (
+                        <Graph 
+                          id={module.id} 
+                          timeRange={timeRange} 
+                          initialSelectedMetrics={(module as Emetric_GraphModule).selectedMetrics}
+                          onMetricsChange={handleMetricsChange}
+                          onMoveUp={handleMoveModuleUp}
+                          onMoveDown={handleMoveModuleDown}
+                          onRemove={handleRemoveModule}
+                          isFirst={index === 0}
+                          isLast={index === modules.length - 1}
+                        />
+                      ) : (
+                        <TextBoxModule
+                          id={module.id}
+                          initialContent={(module as Emetric_TextBoxModule).content}
+                          onContentChange={handleTextBoxContentChange}
+                          onMoveUp={handleMoveModuleUp}
+                          onMoveDown={handleMoveModuleDown}
+                          onRemove={handleRemoveModule}
+                          isFirst={index === 0}
+                          isLast={index === modules.length - 1}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -433,16 +452,15 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
             <div className="view-summary">
               <p>This view contains:</p>
               <ul>
-                <li>{graphs.length} graph{graphs.length !== 1 ? 's' : ''}</li>
-                <li>
-                  {graphs.reduce((total, graphId) => {
-                    const metrics = getSelectedMetricsForGraph(graphId);
-                    return total + metrics.length;
-                  }, 0)} selected metric{graphs.reduce((total, graphId) => {
-                    const metrics = getSelectedMetricsForGraph(graphId);
-                    return total + metrics.length;
-                  }, 0) !== 1 ? 's' : ''}
-                </li>
+              <li>{getGraphModules().length} graph{getGraphModules().length !== 1 ? 's' : ''}</li>
+              <li>{getTextBoxModules().length} text box{getTextBoxModules().length !== 1 ? 'es' : ''}</li>
+              <li>
+                {getGraphModules().reduce((total, module) => {
+                  return total + module.selectedMetrics.length;
+                }, 0)} selected metric{getGraphModules().reduce((total, module) => {
+                  return total + module.selectedMetrics.length;
+                }, 0) !== 1 ? 's' : ''}
+              </li>
                 <li>Time range: {timeRange.preset}</li>
               </ul>
             </div>

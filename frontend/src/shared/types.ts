@@ -92,14 +92,35 @@ export interface TimeRange {
   preset: TimeRangePreset;
 }
 
-// Type for saved graph views
+// Module types for dashboard
+export type ModuleType = 'graph' | 'text-box';
+
+export interface Emetric_Module {
+  id: string;
+  type: ModuleType;
+  position: number; // To determine the order of modules
+}
+
+export interface Emetric_GraphModule extends Emetric_Module {
+  type: 'graph';
+  selectedMetrics: string[];
+}
+
+export interface Emetric_TextBoxModule extends Emetric_Module {
+  type: 'text-box';
+  content: string;
+}
+
+// Type for saved views
 export interface Emetric_SavedView {
   id: string;
   name: string;
   userId: string;
   createdAt: number;
   timeRange: TimeRange;
-  graphs: Array<{
+  modules: Array<Emetric_GraphModule | Emetric_TextBoxModule>;
+  // Keep graphs for backward compatibility
+  graphs?: Array<{
     id: string;
     selectedMetrics: string[];
   }>;
