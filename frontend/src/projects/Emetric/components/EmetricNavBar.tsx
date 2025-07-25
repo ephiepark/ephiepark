@@ -27,6 +27,15 @@ const EmetricNavBar: React.FC<EmetricNavBarProps> = ({ activeView, onViewChange 
           </svg>
           Metrics Explorer
         </button>
+        <button 
+          className={`emetric-navbar-item ${activeView === 'saved-views' ? 'active' : ''}`}
+          onClick={() => onViewChange('saved-views')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="emetric-navbar-icon">
+            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+          </svg>
+          Saved Views
+        </button>
       </div>
     </div>
   );

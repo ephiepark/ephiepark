@@ -7,6 +7,7 @@ import Graph from './components/Graph';
 import EmetricNavBar from './components/EmetricNavBar';
 import MetricExplorer from './components/MetricExplorer';
 import SavedViewsManager from './components/SavedViewsManager';
+import SavedViewsList from './components/SavedViewsList';
 import TimeRangeSelector, { TimeRange } from './components/TimeRangeSelector';
 import { Emetric_SavedView } from '../../shared/types';
 import './Emetric.css';
@@ -138,6 +139,8 @@ const EmetricProject: React.FC = () => {
     switch (activeView) {
       case 'metrics-explorer':
         return <MetricExplorer />;
+      case 'saved-views':
+        return <SavedViewsList onLoadView={handleLoadSavedView} />;
       case 'dashboard':
       default:
         return (

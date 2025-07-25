@@ -383,6 +383,25 @@ class FirebaseApi {
     }
   }
 
+  async getAllSavedEmetricViews(): Promise<Emetric_SavedView[]> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('Must be logged in to get saved views');
+
+      // Query all views without filtering by userId
+      const viewsQuery = query(
+        collection(db, this.SAVED_VIEWS_COLLECTION),
+        orderBy('createdAt', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(viewsQuery);
+      return querySnapshot.docs.map(doc => doc.data() as Emetric_SavedView);
+    } catch (error) {
+      console.error('Error fetching all saved emetric views:', error);
+      throw new Error('Failed to fetch saved views');
+    }
+  }
+
   async getSavedEmetricView(id: string): Promise<Emetric_SavedView | null> {
     try {
       const user = this.getCurrentUser();
@@ -395,14 +414,7 @@ class FirebaseApi {
         return null;
       }
 
-      const view = docSnap.data() as Emetric_SavedView;
-      
-      // Ensure the view belongs to the current user
-      if (view.userId !== user.uid) {
-        throw new Error('Unauthorized access to saved view');
-      }
-
-      return view;
+      return docSnap.data() as Emetric_SavedView;
     } catch (error) {
       console.error(`Error fetching saved emetric view ${id}:`, error);
       throw new Error('Failed to fetch saved view');
