@@ -3,6 +3,11 @@ import { ProjectConfig } from '../shared/types';
 import EmetricProject from './Emetric/EmetricProject';
 import TimelineProject from './Timeline/TimelineProject';
 
+// Define interface for project components with initialTab prop
+interface ProjectComponentProps {
+  initialTab?: string;
+}
+
 export const getProjectById = (id: string): ProjectConfig | null => {
   const ret = projectRegistry.find(project => project.id === id);
   if (ret === null || ret === undefined) {
@@ -28,7 +33,7 @@ export const projectRegistry: Array<ProjectConfig> = [
   }
 ];
 
-export const projectComponentRegistry: Record<string, React.FC> = {
+export const projectComponentRegistry: Record<string, React.FC<ProjectComponentProps>> = {
   'emetric': EmetricProject,
   'timeline': TimelineProject,
 };

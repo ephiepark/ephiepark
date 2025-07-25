@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useFirebase } from '../../firebase/FirebaseContext';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import FirebaseApi from '../../firebase/FirebaseApi';
 import LoginPrompt from '../../components/LoginPrompt';
 import Graph from './components/Graph';
@@ -13,12 +13,16 @@ import { Emetric_SavedView } from '../../shared/types';
 import './Emetric.css';
 import './components/SavedViewsManager.css';
 
-const EmetricProject: React.FC = () => {
+interface EmetricProjectProps {
+  initialTab?: string;
+}
+
+const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
   const { user } = useFirebase();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [graphs, setGraphs] = useState<string[]>(['graph-1']);
-  const [activeView, setActiveView] = useState<string>('dashboard');
+  const [activeView, setActiveView] = useState<string>(initialTab || 'dashboard');
   const [timeRange, setTimeRange] = useState<TimeRange>({
     startDate: null,
     endDate: new Date(),
@@ -32,6 +36,26 @@ const EmetricProject: React.FC = () => {
   const selectedMetricsRef = useRef<Record<string, string[]>>({
     'graph-1': []
   });
+
+  // Effect to sync the URL with the active view when initialTab changes
+  useEffect(() => {
+    if (initialTab && initialTab !== activeView) {
+      setActiveView(initialTab);
+    }
+  }, [initialTab]);
+
+  // Effect to handle initial navigation
+  useEffect(() => {
+    // If we're at /projects/emetric without a tab, redirect to /projects/emetric/dashboard
+    if (!initialTab && user) {
+      const viewId = searchParams.get('viewId');
+      if (viewId) {
+        navigate(`/projects/emetric/dashboard?viewId=${viewId}`);
+      } else {
+        navigate('/projects/emetric/dashboard');
+      }
+    }
+  }, [initialTab, user, navigate, searchParams]);
 
   // Load view from URL parameter when component mounts
   useEffect(() => {
@@ -93,6 +117,16 @@ const EmetricProject: React.FC = () => {
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
+    
+    // Update URL to reflect the current view
+    const viewId = searchParams.get('viewId');
+    
+    // Preserve the viewId parameter if it exists
+    if (viewId) {
+      navigate(`/projects/emetric/${view}?viewId=${viewId}`);
+    } else {
+      navigate(`/projects/emetric/${view}`);
+    }
   };
 
   const handleMetricsChange = (graphId: string, metrics: string[]) => {
@@ -127,7 +161,8 @@ const EmetricProject: React.FC = () => {
 
     // Update URL with viewId parameter
     if (updateUrl) {
-      setSearchParams({ viewId: view.id });
+      // Navigate to the current view with the viewId parameter
+      navigate(`/projects/emetric/${activeView}?viewId=${view.id}`);
     }
   };
 

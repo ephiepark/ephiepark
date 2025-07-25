@@ -122,6 +122,11 @@ function App() {
                   <ProjectPage />
                 </div>
               } />
+              <Route path="/projects/:projectId/:tab" element={
+                <div className="main-content-wide">
+                  <ProjectPage />
+                </div>
+              } />
               <Route
                 path="/profile"
                 element={

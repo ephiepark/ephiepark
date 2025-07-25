@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { getProjectById, projectComponentRegistry } from '../projects/registry';
 
 const ProjectPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId, tab } = useParams<{ projectId: string; tab?: string }>();
 
   if (!projectId) {
     return <Navigate to="/projects" replace />;
@@ -16,7 +16,7 @@ const ProjectPage: React.FC = () => {
   }
 
   const Component = projectComponentRegistry[projectId];
-  return <Component />;
+  return <Component initialTab={tab} />;
 };
 
 export default ProjectPage;
