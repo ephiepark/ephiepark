@@ -81,26 +81,15 @@ const SavedViewsList: React.FC<SavedViewsListProps> = ({ onLoadView }) => {
                 </p>
                 <p className="saved-view-date">Saved on {formatDate(view.createdAt)}</p>
                 <p className="saved-view-details">
-                  {view.modules ? (
-                    <>
-                      {view.modules.filter(m => m.type === 'graph').length} graph{view.modules.filter(m => m.type === 'graph').length !== 1 ? 's' : ''} • 
-                      {view.modules.filter(m => m.type === 'text-box').length} text box{view.modules.filter(m => m.type === 'text-box').length !== 1 ? 'es' : ''} • 
-                      {view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
-                        const graphModule = module as Emetric_GraphModule;
-                        return total + graphModule.selectedMetrics.length;
-                      }, 0)} metric{view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
-                        const graphModule = module as Emetric_GraphModule;
-                        return total + graphModule.selectedMetrics.length;
-                      }, 0) !== 1 ? 's' : ''}
-                    </>
-                  ) : view.graphs ? (
-                    <>
-                      {view.graphs.length} graph{view.graphs.length !== 1 ? 's' : ''} • 
-                      {view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0)} metric{view.graphs.reduce((total, graph) => total + graph.selectedMetrics.length, 0) !== 1 ? 's' : ''}
-                    </>
-                  ) : (
-                    'No modules or graphs'
-                  )}
+                  {view.modules.filter(m => m.type === 'graph').length} graph{view.modules.filter(m => m.type === 'graph').length !== 1 ? 's' : ''} • 
+                  {view.modules.filter(m => m.type === 'text-box').length} text box{view.modules.filter(m => m.type === 'text-box').length !== 1 ? 'es' : ''} • 
+                  {view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
+                    const graphModule = module as Emetric_GraphModule;
+                    return total + graphModule.selectedMetrics.length;
+                  }, 0)} metric{view.modules.filter(m => m.type === 'graph').reduce((total, module) => {
+                    const graphModule = module as Emetric_GraphModule;
+                    return total + graphModule.selectedMetrics.length;
+                  }, 0) !== 1 ? 's' : ''}
                 </p>
               </div>
               <div className="saved-view-actions">

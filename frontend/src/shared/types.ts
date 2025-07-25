@@ -119,9 +119,4 @@ export interface Emetric_SavedView {
   createdAt: number;
   timeRange: TimeRange;
   modules: Array<Emetric_GraphModule | Emetric_TextBoxModule>;
-  // Keep graphs for backward compatibility
-  graphs?: Array<{
-    id: string;
-    selectedMetrics: string[];
-  }>;
 }

@@ -260,19 +260,8 @@ const EmetricProject: React.FC<EmetricProjectProps> = ({ initialTab }) => {
     // Update time range
     setTimeRange(view.timeRange);
     
-    // Handle both new module structure and legacy graphs structure
-    if (view.modules) {
-      setModules(view.modules);
-    } else if (view.graphs) {
-      // Convert legacy graphs to modules
-      const convertedModules: Array<Emetric_GraphModule> = view.graphs.map((graph, index) => ({
-        id: graph.id,
-        type: 'graph',
-        position: index,
-        selectedMetrics: graph.selectedMetrics
-      }));
-      setModules(convertedModules);
-    }
+    // Set modules
+    setModules(view.modules);
     
     // Hide saved views panel after loading
     setShowSavedViews(false);
