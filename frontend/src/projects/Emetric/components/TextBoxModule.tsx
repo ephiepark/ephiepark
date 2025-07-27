@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import './TextBoxModule.css';
 
 interface TextBoxModuleProps {
@@ -23,10 +24,15 @@ const TextBoxModule: React.FC<TextBoxModuleProps> = ({
   isLast
 }) => {
   const [content, setContent] = useState(initialContent);
+  const [isEditing, setIsEditing] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
     onContentChange(id, e.target.value);
+  };
+
+  const toggleEditMode = () => {
+    setIsEditing(!isEditing);
   };
   
   return (
@@ -62,14 +68,32 @@ const TextBoxModule: React.FC<TextBoxModuleProps> = ({
             </svg>
             Remove
           </button>
+          <button 
+            className="edit-toggle-button" 
+            onClick={toggleEditMode}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d={isEditing 
+                ? "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                : "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"}
+              />
+            </svg>
+            {isEditing ? 'View' : 'Edit'}
+          </button>
         </div>
       </div>
-      <textarea
-        className="text-box-content"
-        value={content}
-        onChange={handleChange}
-        placeholder="Enter your notes here..."
-      />
+      {isEditing ? (
+        <textarea
+          className="text-box-content"
+          value={content}
+          onChange={handleChange}
+          placeholder="Enter your notes here... (Markdown supported)"
+        />
+      ) : (
+        <div className="markdown-content">
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 };
